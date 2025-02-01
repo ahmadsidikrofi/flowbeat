@@ -1,23 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import useBLE from './useBLE';
+// import useBLE from './useBLE';
 import { useAuth } from './AuthProvider';
+import Config from './Config';
 
 export const useLatestBloodPressure = () => {
     const [refreshing, setRefreshing] = useState(false)
     const [ syncData, setSyncData ] = useState(false)
-    const { requestPermissions } = useBLE()
+    // const { requestPermissions } = useBLE()
     const [ localDataBP, setLocalDataBP ] = useState([])
+    const [ latestBPFromDB, setLatestBPFromDB ] = useState('')
     const [ isSuccess, setIsSuccess ] = useState(null)
     const { userToken, user } = useAuth()
+    const baseURL = Config.BASE_URL
 
     const getBloodPressure = async () => {
-        const isPermissionsEnabled = requestPermissions();
-        if (!isPermissionsEnabled) {
-            Alert.alert('Permissions Denied', 'Please enable Bluetooth and Location permissions to proceed.');
-            return;
-        }
+        // const isPermissionsEnabled = requestPermissions();
+        // if (!isPermissionsEnabled) {
+        //     Alert.alert('Permissions Denied', 'Please enable Bluetooth and Location permissions to proceed.');
+        //     return;
+        // }
         try {
             setRefreshing(true)
             setSyncData(true)
@@ -48,7 +51,8 @@ export const useLatestBloodPressure = () => {
                 setIsSuccess(true)
                 setTimeout(() => setIsSuccess(null), 4000)
                 if (userToken) {
-                    const res = await axios.post(`https://ffff-2001-448a-4007-2e7c-293f-6075-f32c-9e99.ngrok-free.app/api/patient-health-data/${user?.uuid}`, {
+                    setSyncData(true)
+                    const res = await axios.post(`${baseURL}/api/patient-health-data/${user?.uuid}`, {
                         sys: latestRecords.sys,
                         dia: latestRecords.dia,
                         bpm: latestRecords.bpm,
@@ -57,6 +61,7 @@ export const useLatestBloodPressure = () => {
                         patient_id: user?.id,
                     }, { headers: { Authorization: `Bearer ${userToken}` } })
                     console.log(res.data)
+                    LatestDataBloodPressureFromDB()
                 }
             } else {
                 console.log("No records found", "No new data available from the device.")
@@ -72,7 +77,7 @@ export const useLatestBloodPressure = () => {
             setSyncData(false)
         }
     }
-    useState(() => {
+    useEffect(() => {
         const getLocalBloodPressure = async () => {
            const data = JSON.parse(await AsyncStorage.getItem('blood-pressure-data')) || {}
            setLocalDataBP(data)
@@ -81,11 +86,29 @@ export const useLatestBloodPressure = () => {
     }, [])
     const latestBP = localDataBP && localDataBP.length > 0 ? localDataBP[localDataBP.length - 1] : null
 
+    const LatestDataBloodPressureFromDB = async () => {
+        if (userToken) {
+            try {
+                const res = await axios.get(
+                    `${baseURL}/api/latest-health-data`,
+                    { headers: { Authorization: `Bearer ${userToken}` } }
+                );
+                setLatestBPFromDB(res.data[0])
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+    }
+    useEffect(() => {
+        LatestDataBloodPressureFromDB()
+    }, [userToken])
+
   return {
-    latestBP,
     refreshing,
     syncData,
     isSuccess,
-    getBloodPressure,
+    latestBP,
+    latestBPFromDB,
+    getBloodPressure
   };
 };

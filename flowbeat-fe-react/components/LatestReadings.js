@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, Image, ToastAndroid, Platform } from "react-native";
 import LatestBPRead from "./LatestBPRead"
   
-const LatestReadings = ({ title, latestBP, getBloodPressure, syncData, isSuccess }) => {
+const LatestReadings = ({ title, latestBP,latestBPFromDB,  getBloodPressure, syncData, isSuccess }) => {
     function notifyMessage(msg) {
         if (Platform.OS === 'android') {
             ToastAndroid.show(msg, ToastAndroid.SHORT)
@@ -45,7 +45,7 @@ const LatestReadings = ({ title, latestBP, getBloodPressure, syncData, isSuccess
                 </TouchableOpacity>
             </View>
             <View>
-                <LatestBPRead latestBP={latestBP}/>
+                <LatestBPRead latestBP={latestBP} latestBPFromDB={latestBPFromDB} syncData={syncData}/>
             </View>
         </View>
      );

@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '../components/ui/ThemedText';
+import { ThemedView } from '../components/ui/ThemedView';
 import { Ionicons } from "@expo/vector-icons";
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';

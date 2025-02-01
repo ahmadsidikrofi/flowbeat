@@ -92,17 +92,28 @@ class AuthController extends Controller
         }
     }
 
-    public function UpdatePatientData()
+    public function UpdatePatientData( Request $request, $uuid )
     {
-
+        $patient = PatientModel::where('uuid', $uuid)->first();
+        if (!$patient)  return response()->json(['message' => 'Patient not found, your uuid is wrong'], 404);
+        if (Auth::check()) {
+            $patient->update($request->all());
+            return response()->json([
+                'message' => 'Your profile data has been updated',
+                'data' => $patient,
+            ]);
+        }
+        return response()->json(['message' => 'Unauthorized, login first'], 401);
     }
 
     public function SignOutPatient()
     {
-        Auth::user()->tokens()->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Successfully Logout. Dont forget to come back',
-        ], 200);
+        if (Auth::check()) {
+            Auth::user()->tokens()->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully Logout. Dont forget to come back',
+            ], 200);
+        }
     }
 }

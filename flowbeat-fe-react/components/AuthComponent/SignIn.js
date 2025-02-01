@@ -1,10 +1,11 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '../ui/ThemedText';
+import { ThemedView } from '../ui/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useState } from 'react';
 import { Pressable, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '../../utils/AuthProvider';
+import Config from '../../utils/Config';
 
 const SignIn = ({ setSignInModal, setAuthModal }) => {
     const [ peekPassword, setPeekPassword ] = useState(true)
@@ -15,10 +16,11 @@ const SignIn = ({ setSignInModal, setAuthModal }) => {
     const [ isLoading, setIsLoading ] = useState(false)
     const [ error, setError ] = useState('')
     const { signIn } = useAuth()
+    const baseURL = Config.BASE_URL
 
     const handleSignInPatient = async () => {
         setIsLoading(true)
-        await axios.post('https://ffff-2001-448a-4007-2e7c-293f-6075-f32c-9e99.ngrok-free.app/api/auth/sign-in', {
+        await axios.post(`${baseURL}/api/auth/sign-in`, {
             phone_number: phoneNumber,
             password: password
         }).then(async(res) => {

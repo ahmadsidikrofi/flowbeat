@@ -1,6 +1,6 @@
 import { Modal, Pressable, SafeAreaView, ScrollView, TouchableOpacity, View } from "react-native";
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '../../components/ui/ThemedText';
+import { ThemedView } from '../../components/ui/ThemedView';
 import { Ionicons } from "@expo/vector-icons";
 import DeviceCard from "../../components/DeviceCard";
 import DeviceModal from "../../components/DeviceModal";

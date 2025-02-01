@@ -20,9 +20,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/auth/patient/{uuid}', [AuthController::class, "UpdatePatientData"]);
     Route::post('/auth/sign-out', [AuthController::class, "SignOutPatient"]);
     Route::post('/patient-health-data/{uuid}', [VitalSignController::class, "StoreHealthData"]);
-    Route::get('/track-health-data', [VitalSignController::class, "ReadHistoryHealthData"]);
     Route::get('/latest-health-data', [VitalSignController::class, "ReadLatestHealthData"]);
+    Route::get('/track-health-data', [VitalSignController::class, "ReadHistoryHealthData"]);
+    Route::get('/track-health-data/{id}', [VitalSignController::class, "ReadHistoryHealthDataByID"]);
+    Route::delete('track-health-data/{id}', [VitalSignController::class, "DeleteHistoryHealthDataByID"]);
 });
 
 // ==== Website endpoint =====
+Route::get('/patients', [VitalSignController::class, "GetAllPatients"]);
+Route::get('/patients/{uuid}', [VitalSignController::class, "GetPatientByUUID"]);
+
 

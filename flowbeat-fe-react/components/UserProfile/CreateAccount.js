@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '../../components/ui/ThemedText';
+import { ThemedView } from '../../components/ui/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Modal, TouchableOpacity } from 'react-native';
@@ -12,7 +12,7 @@ const CreateAccount = () => {
         <ThemedView style={{ padding: 15 }}>
             {userToken ? (
                 <>
-                    <ThemedText style={{ fontSize: 12, fontWeight: '400', color: '#ef4444' }}>Omblepy Account</ThemedText>
+                    <ThemedText style={{ fontSize: 12, fontWeight: '400', color: '#ef4444' }}>Flowbeat Account</ThemedText>
                     <ThemedView style={{ marginTop: 18 }}>
                         <ThemedText style={{ fontSize: 18, fontWeight: '400' }}>Nama lengkap</ThemedText>
                         <ThemedText style={{ fontSize: 12, fontWeight: '400', color: '#737373' }}>{user?.first_name} {user?.last_name}</ThemedText>

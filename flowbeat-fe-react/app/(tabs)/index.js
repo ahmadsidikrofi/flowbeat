@@ -5,7 +5,7 @@ import '@/global.css'
 import { useLatestBloodPressure } from '@/utils/useLatestBloodPressure';
 
 export default function HomeScreen() {
-  const { refreshing, syncData, isSuccess, getBloodPressure, latestBP } = useLatestBloodPressure()
+  const { refreshing, syncData, isSuccess, getBloodPressure, latestBP, latestBPFromDB } = useLatestBloodPressure()
   
   return (
     <ScrollView style={{ backgroundColor: '#fff' }}
@@ -15,7 +15,7 @@ export default function HomeScreen() {
     >
       <View className="mt-8 mx-4">
         <FavouriteContent title="Favourite Contents" />
-        <LatestReadings title="Latest Readings" latestBP={latestBP} isSuccess={isSuccess} syncData={syncData} getBloodPressure={getBloodPressure} />
+        <LatestReadings title="Latest Readings" latestBP={latestBP} latestBPFromDB={latestBPFromDB} isSuccess={isSuccess} syncData={syncData} getBloodPressure={getBloodPressure} />
       </View>
     </ScrollView>
   );

@@ -1,6 +1,6 @@
 import { SafeAreaView, ScrollView, Text, View } from "react-native"
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '../../components/ui/ThemedText';
+import { ThemedView } from '../../components/ui/ThemedView';
 import CreateAccount from "../../components/UserProfile/CreateAccount";
 import LocalProfile from "../../components/UserProfile/LocalProfile";
 

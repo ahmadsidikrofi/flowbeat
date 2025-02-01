@@ -1,12 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import axios from "axios"
 import { createContext, useContext, useEffect, useState } from "react"
+import Config from "./Config"
 
 const AuthContext = createContext()
 export const AuthProvider = ({ children }) => {
     const [ userToken, setUserToken ] = useState(null)
     const [ isLoading, setIsLoading ] = useState(true)
     const [ user, setUser ] = useState(null)
+    const baseURL = Config.BASE_URL
 
     useEffect(() => {
         const loadTokenAndUser = async () => {
@@ -27,7 +29,8 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUserData = async (token) => {
         try {
-            const res = await axios.get('https://ffff-2001-448a-4007-2e7c-293f-6075-f32c-9e99.ngrok-free.app/api/auth/patient', {
+            const res = await axios.get(`${baseURL}/api/auth/patient`, {
+            // const res = await axios.get('https://35c1-2001-448a-4007-45ff-d0f3-ab3e-9f07-521.ngrok-free.app/api/auth/patient', {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setUser(res.data)
