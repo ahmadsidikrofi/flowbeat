@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->index('uuid');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('phone_number')->unique();
@@ -21,9 +22,11 @@ return new class extends Migration
             $table->string('password');
             $table->string('date_of_birth')->nullable();
             $table->string('gender')->nullable();
+            $table->string('age')->nullable();
             $table->string('address')->nullable();
             $table->string('height')->nullable();
             $table->string('weight')->nullable();
+            // $table->boolean('is_login')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

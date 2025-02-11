@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('patient_vitals', function (Blueprint $table) {
+        Schema::create('patient_blood_pressure', function (Blueprint $table) {
             $table->id();
             $table->foreignId('patient_id')->references('id')->on('patients')->onDelete('cascade');
+            $table->integer('sys')->nullable();
+            $table->integer('dia')->nullable();
             $table->integer('bpm')->nullable();
-            $table->string('bpm_status')->nullable();
-            $table->integer('spo2')->nullable();
-            $table->string('spo2_status')->nullable();
+            $table->boolean('mov')->nullable();
+            $table->boolean('ihb')->nullable();
+            $table->string('status')->nullable();
+            $table->string('device')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('patient_vitals');
+        Schema::dropIfExists('patient_blood_pressure');
     }
 };
