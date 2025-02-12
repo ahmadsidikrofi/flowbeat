@@ -56,7 +56,7 @@ const LatestVitalSigns = ({ heartRate, spo2 }) => {
             </View>
             <View style={{ flexDirection: "row", gap:12,  marginVertical: 16 }}>
                 <VitalSignCard
-                    title="Denyut"
+                    title="Denyut Nadi"
                     value={latestVitalSign?.bpm || "--"}
                     unit="bpm"
                     isNormal={latestVitalSign?.bpm_status || "--"}
