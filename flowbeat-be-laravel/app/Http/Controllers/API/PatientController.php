@@ -88,11 +88,15 @@ class PatientController extends Controller
     public function GetPatientByUUID($uuid)
     {
         Carbon::setLocale('id');
-        $patient = PatientModel::select('id', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 'gender', 'address', 'height', 'weight', 'created_at')
-        ->with(['healthData' => function ($query) {
-            $query->select('id', 'patient_id', 'sys', 'dia', 'bpm', 'mov', 'ihb', 'status', 'device', 'created_at')
-                  ->orderBy('created_at', 'desc');
-        }])->where('uuid', $uuid)->first();
+        $cacheKey = "patient_data_{$uuid}";
+
+        $patient = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($uuid) {
+            return  PatientModel::select('id', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 'gender', 'address', 'height', 'weight', 'created_at')
+            ->with(['healthData' => function ($query) {
+                $query->select('id', 'patient_id', 'sys', 'dia', 'bpm', 'mov', 'ihb', 'status', 'device', 'created_at')
+                      ->orderBy('created_at', 'desc');
+            }])->where('uuid', $uuid)->first();
+        });
 
         if ($patient) {
             $formattedPatient = $patient->toArray();
@@ -159,20 +163,19 @@ class PatientController extends Controller
         ], 200);
     }
 
-    public function GetPatientBloodPressureData(Request $request, $id)
+    public function GetPatientBloodPressureData($id)
     {
-        $limit = $request->query('limit', 30);
-        $cacheKey = "bp_data_{$id}_{$limit}";
+        $cacheKey = "bp_data_{$id}";
 
-        $data = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($id, $limit) {
-            return PatientModel::with(['healthData' => function ($query) use ($limit) {
-                $query->orderBy('created_at', 'desc')->limit($limit);
+        $data = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($id) {
+            return PatientModel::with(['healthData' => function ($query) {
+                $query->orderBy('created_at', 'asc');
             }])->findOrFail($id)->healthData
             ->map(function ($record) {
                 return [
                     'date' => $record->created_at->format('Y-m-d'),
                     'systolic' => $record->sys,
-                    'diastolic' => $record->dia
+                    'diastolic' => $record->dia,
                 ];
             });
         });
