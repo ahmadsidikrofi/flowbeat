@@ -158,4 +158,24 @@ class PatientController extends Controller
             'data' => $statusDistribution
         ], 200);
     }
+
+    public function GetPatientBloodPressureData(Request $request, $id)
+    {
+        $limit = $request->query('limit', 30);
+        $cacheKey = "bp_data_{$id}_{$limit}";
+
+        $data = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($id, $limit) {
+            return PatientModel::with(['healthData' => function ($query) use ($limit) {
+                $query->orderBy('created_at', 'desc')->limit($limit);
+            }])->findOrFail($id)->healthData
+            ->map(function ($record) {
+                return [
+                    'date' => $record->created_at->format('Y-m-d'),
+                    'systolic' => $record->sys,
+                    'diastolic' => $record->dia
+                ];
+            });
+        });
+        return response()->json($data, 200);
+    }
 }

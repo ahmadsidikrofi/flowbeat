@@ -43,3 +43,4 @@ Route::get('/patient-status', [PatientController::class, "GetPatientStatus"]);
 Route::get('/recent-patients', [PatientController::class, "RecentPatients"]);
 Route::get('/status-distribution', [PatientController::class, "DistributionBPStatus"]);
 Route::get('/patients/{uuid}', [PatientController::class, "GetPatientByUUID"]);
+Route::get('/blood-pressure-data/{id}', [PatientController::class, "GetPatientBloodPressureData"]);
