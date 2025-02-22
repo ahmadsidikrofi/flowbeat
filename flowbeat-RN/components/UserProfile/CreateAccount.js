@@ -12,14 +12,14 @@ const CreateAccount = () => {
         <ThemedView style={{ padding: 15 }}>
             {userToken ? (
                 <>
-                    <ThemedText style={{ fontSize: 12, fontWeight: '400', color: '#ef4444' }}>Flowbeat Account</ThemedText>
+                    <ThemedText style={{ fontSize: 16, fontWeight: '400', color: '#ef4444' }}>Flowbeat Account</ThemedText>
                     <ThemedView style={{ marginTop: 18 }}>
                         <ThemedText style={{ fontSize: 18, fontWeight: '400' }}>Nama lengkap</ThemedText>
-                        <ThemedText style={{ fontSize: 12, fontWeight: '400', color: '#737373' }}>{user?.first_name} {user?.last_name}</ThemedText>
+                        <ThemedText style={{ fontSize: 18, fontWeight: '400', color: '#737373' }}>{user?.first_name} {user?.last_name}</ThemedText>
                     </ThemedView>
                     <ThemedView style={{ marginVertical: 18 }}>
                         <ThemedText style={{ fontSize: 18, fontWeight: '400' }}>Nomor handphone</ThemedText>
-                        <ThemedText style={{ fontSize: 12, fontWeight: '400', color: '#737373' }}>{user?.phone_number}</ThemedText>
+                        <ThemedText style={{ fontSize: 18, fontWeight: '400', color: '#737373' }}>{user?.phone_number}</ThemedText>
                     </ThemedView>
                     <ThemedView style={{ height: 0.5, width: '100%', backgroundColor: '#ddd', marginVertical: 10, elevation: 1 }}></ThemedView>
                     <ThemedView style={{ flexDirection: 'col', gap: 30 }}>
@@ -30,9 +30,9 @@ const CreateAccount = () => {
                 </>
             ) : (
                 <>
-                    <ThemedText style={{ fontSize: 12, fontWeight: '400', marginBotton: 20 }}>Koneksikan Akunmu</ThemedText>
-                    <ThemedView style={{ flexDirection: 'row', justifyContent: 'self-between', gap: 20 }}>
-                        <TouchableOpacity style={{ backgroundColor: '#fff', padding: 8, borderWidth: 0.1, borderRadius: 10, elevation: 3 }} onPress={() => setAuthModal(true)}><ThemedText style={{ fontSize: 18, fontWeight: '400', color: '#000' }}>Buat Akun Flowbeat</ThemedText></TouchableOpacity>
+                    <ThemedText style={{ fontSize: 16, fontWeight: '400' }}>Koneksikan Akunmu</ThemedText>
+                    <ThemedView style={{ flexDirection: 'row', justifyContent: 'self-between', gap: 20, marginTop: 14 }}>
+                        <TouchableOpacity style={{ backgroundColor: '#fff', padding: 8, borderWidth: 0.1, borderRadius: 10, elevation: 3 }} onPress={() => setAuthModal(true)}><ThemedText style={{ fontSize: 20, fontWeight: '400', color: '#000' }}>Buat Akun Flowbeat</ThemedText></TouchableOpacity>
                         <ThemedView style={{ justifyContent: 'center', alignItems: 'center' }}>
                             <Ionicons size={20} name='warning' color="#D91656" />
                         </ThemedView>

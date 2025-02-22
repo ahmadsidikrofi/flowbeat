@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, TextInput, TouchableOpacity } from 'react-native';
+import Config from "@/utils/Config"
 
 const SignUp = ({ setSignUpModal, setSignInModal }) => {
     const [ isLoading, setIsLoading ] = useState(false)
@@ -20,6 +21,7 @@ const SignUp = ({ setSignUpModal, setSignInModal }) => {
     const [ password, setPassword ] = useState('')
     const [ confirmPassword, setConfirmPassword ] = useState('')
     const [ error, setError ] = useState('')
+    const baseURL = Config.BASE_URL
 
     const handleSignUpPatient = async () => {
         if (password !== confirmPassword) {
@@ -27,7 +29,7 @@ const SignUp = ({ setSignUpModal, setSignInModal }) => {
 			return;
 		}
         setIsLoading(true)
-        await axios.post('https://ffff-2001-448a-4007-2e7c-293f-6075-f32c-9e99.ngrok-free.app/api/auth/sign-up', {
+        await axios.post(`${baseURL}/api/auth/sign-up`, {
             first_name: firstName,
             last_name: lastName,
             phone_number: phoneNumber,

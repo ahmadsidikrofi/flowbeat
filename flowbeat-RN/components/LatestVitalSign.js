@@ -18,16 +18,16 @@ const VitalSignCard = ({ title, value, unit, isNormal, icon }) => (
                 <Text variant="titleLarge" style={{ color: "#333" }}> {unit} </Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 }}>
-                <Text variant="titleLarge" style={{ color: isNormal ? "#15A34A" : "#D32F2F" }}>
-                    {isNormal ? "Normal" : "Tidak Normal"}
+                <Text variant="titleLarge" style={{ color: isNormal === "Normal" ? "#15A34A" : isNormal === "Cukup Normal" ? "#f59e0b" : "#D32F2F" }}>
+                    {isNormal}
                 </Text>
-                <Ionicons name={"arrow-forward-outline"} size={24} color={isNormal ? "#15A34A" : "#D32F2F"} />
+                <Ionicons name={"arrow-forward-outline"} size={24} color={isNormal === "Normal" ? "#15A34A" : isNormal === "Cukup Normal" ? "#f59e0b" : "#D32F2F"} />
             </View>
         </Card.Content>
     </Card>
 )
 
-const LatestVitalSigns = ({ heartRate, spo2 }) => {
+const LatestVitalSigns = () => {
     const { userToken } = useAuth()
     const baseURL = Config.BASE_URL
     const [ latestVitalSign, setLatestVitalSign ] = useState('')
@@ -43,8 +43,6 @@ const LatestVitalSigns = ({ heartRate, spo2 }) => {
     useEffect(() => {
         LatestVitalSignFromDB()
     }, [userToken, latestVitalSign])
-    const isHeartRateNormal = (rate) => rate >= 60 && rate <= 100
-    const isSpo2Normal = (level) => level >= 95
 
     return (
         <View>
@@ -54,7 +52,7 @@ const LatestVitalSigns = ({ heartRate, spo2 }) => {
                 </Text>
                 {/* <Button mode="contained" >Sync Data</Button> */}
             </View>
-            <View style={{ flexDirection: "row", gap:12,  marginVertical: 16 }}>
+            <View style={{ flexDirection: "row", gap: 12, marginVertical: 16 }}>
                 <VitalSignCard
                     title="Denyut Nadi"
                     value={latestVitalSign?.bpm || "--"}

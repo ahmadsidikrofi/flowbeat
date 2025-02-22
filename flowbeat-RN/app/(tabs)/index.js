@@ -15,7 +15,7 @@ export default function HomeScreen() {
       }
     >
       <View style={{ marginVertical: 24, marginHorizontal: 16 }}>
-        <LatestReadings title="Sinkronisasi Tekanan Darah" latestBP={latestBP} latestBPFromDB={latestBPFromDB} isSuccess={isSuccess} syncData={syncData} getBloodPressure={getBloodPressure} />
+        <LatestReadings title="Cek Tekanan Darah Terbaru" latestBP={latestBP} latestBPFromDB={latestBPFromDB} isSuccess={isSuccess} syncData={syncData} getBloodPressure={getBloodPressure} />
         {/* Health Insights */}
         <HealthInsight latestBP={latestBP} latestBPFromDB={latestBPFromDB} />
 

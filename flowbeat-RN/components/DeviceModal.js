@@ -21,7 +21,7 @@ const DeviceModal = ({ setModalVisible }) => {
             try {
                 console.log("Scanning Device")
                 // const res = await axios.get('http://192.168.0.102:8000/scan')
-                const res = await axios.get('http://192.168.135.236:8000/scan')
+                const res = await axios.get('http://192.168.223.236:8000/scan')
                 const devices = res.data.devices
                 const targetDevice = devices.find((device) => device.name.includes('BLESmart'))
                 if (targetDevice) {

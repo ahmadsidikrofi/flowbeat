@@ -26,7 +26,8 @@ export const useLatestBloodPressure = () => {
             setRefreshing(true)
             setSyncData(true)
             console.log("Fetching blood pressure data...")
-            const res = await axios.post('http://192.168.1.3:8000/latest-bp-records', {
+            // const res = await axios.post('http://192.168.1.3:8000/latest-bp-records', {
+            const res = await axios.post('http://192.168.223.236:8000/latest-bp-records', {
                 mac_address: 'FA:E4:FA:F7:F7:AC', // Masih setting manual
                 device_name: 'BLESmart_00000480FAE4FAF7F7AC', // Masih setting manual
                 new_records_only: false,

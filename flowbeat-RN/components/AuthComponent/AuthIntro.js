@@ -22,15 +22,15 @@ const AuthIntro = ({ setAuthModal }) => {
                 <ThemedView style={{ flexDirection: 'col', alignItems: 'flex-start', paddingHorizontal: 40 }}>
                     <ThemedView style={{ flexDirection: 'row', gap: 10 }}>
                         <Ionicons size={25} name="checkmark-circle-outline" color="#2563eb"></Ionicons>
-                        <ThemedText style={{ marginBottom: 10, textAlign: 'justify' }}>Akses data historis untuk melihat data tekanan darah kamu dari waktu ke waktu</ThemedText>
+                        <ThemedText style={{ marginBottom: 10, textAlign: 'justify', lineHeight: 30 }}>Bisa lihat riwayat tekanan darah kapan saja, biar lebih gampang kalau ada perubahan kesehatan.</ThemedText>
                     </ThemedView>
                     <ThemedView style={{ flexDirection: 'row', gap: 10 }}>
                         <Ionicons size={25} name="checkmark-circle-outline" color="#2563eb"></Ionicons>
-                        <ThemedText style={{ marginBottom: 10, textAlign: 'justify' }}>Beri kemudahan untuk pasang alarm sebagai pemberitahuan dan pengingat kamu secara teratur</ThemedText>
+                        <ThemedText style={{ marginBottom: 10, textAlign: 'justify', lineHeight: 30 }}>Ada pengingat otomatis supaya tidak lupa cek tekanan darah secara rutin.</ThemedText>
                     </ThemedView>
                     <ThemedView style={{ flexDirection: 'row', gap: 10 }}>
                         <Ionicons size={25} name="checkmark-circle-outline" color="#2563eb"></Ionicons>
-                        <ThemedText>Bantu doktermu lebih mudah dalam menganalisis kesehatanmu</ThemedText>
+                        <ThemedText style={{ lineHeight: 30 }}>Data bisa langsung dilihat dokter, jadi lebih mudah buat mereka memantau kesehatan kamu.</ThemedText>
                     </ThemedView>
                 </ThemedView>
             </ThemedView>

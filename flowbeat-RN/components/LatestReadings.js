@@ -11,9 +11,9 @@ const LatestReadings = ({ title, latestBP,latestBPFromDB,  getBloodPressure, syn
     }
     return ( 
         <View className="mt-8">
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
-                <Text style={{ fontSize: 23, fontWeight: '400' }}>{title}</Text>
-                <TouchableOpacity disabled={syncData || isSuccess === false} onPress={getBloodPressure} style={{ padding: 10, width: '25%', borderRadius: 10, borderWidth: 0.1, elevation: 2, backgroundColor: syncData ? '#e5e5e5' : '#2563eb' }}>
+            <View style={{ width: '100%',flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
+                <Text style={{ fontSize: 23, fontWeight: '400', flexShrink: 1 }}>{title}</Text>
+                <TouchableOpacity disabled={syncData || isSuccess === false} onPress={getBloodPressure} style={{ minWidth: 120, padding: 10, borderRadius: 10, borderWidth: 0.1, elevation: 2, backgroundColor: syncData ? '#e5e5e5' : '#2563eb' }} >
                     {syncData ? (
                         <>
                             {notifyMessage('Memulai proses sinkronisasi')}
@@ -36,11 +36,11 @@ const LatestReadings = ({ title, latestBP,latestBPFromDB,  getBloodPressure, syn
                     ) : isSuccess === true ? (
                         <>
                             {notifyMessage('Sinkronisasi berhasil dilakukan')}
-                            <Text style={{ textAlign: 'center' }}>Sync Data</Text>
+                            <Text style={{ textAlign: 'center',color: '#fff', fontWeight: '600', lineHeight: 24 }}>Ambil Data Terbaru</Text>
                         </>
                     ) : (
                         <>
-                            <Text style={{ textAlign: 'center', color: '#fff' }}>Sync Data</Text>
+                            <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600', lineHeight: 24 }}>Ambil Data Terbaru</Text>
                         </>
                     )}
                 </TouchableOpacity>
