@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Modules\PatientModule;
 
 use App\Http\Controllers\Controller;
 use App\Models\PatientModel;
@@ -26,7 +26,7 @@ class PatientController extends Controller
     public function GetPatientStatus()
     {
         $cacheKey = 'patient_status'; // Key untuk cache
-        $cacheTTL = 300;
+        $cacheTTL = 100;
 
         $patientStatus = Cache::remember($cacheKey, $cacheTTL, function () {
             $totalPatient = PatientModel::count();
@@ -176,6 +176,24 @@ class PatientController extends Controller
                     'date' => $record->created_at->format('Y-m-d'),
                     'systolic' => $record->sys,
                     'diastolic' => $record->dia,
+                ];
+            });
+        });
+        return response()->json($data, 200);
+    }
+
+    public function GetPatientVitalSignData($id)
+    {
+        $cacheKey = "vita_sign_data_{$id}";
+        $data = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($id) {
+            return PatientModel::with(["vitalsData" => function ($query) {
+                $query->orderBy('created_at', 'asc');
+            }])->findOrFail($id)->vitalsData
+            ->map(function ($record) {
+                return [
+                    'date' => $record->created_at->format('Y-m-d'),
+                    'bpm' => $record->bpm,
+                    'spo2' => $record->spo2
                 ];
             });
         });

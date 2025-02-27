@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\BloodPressureController;
-use App\Http\Controllers\API\PatientController;
+use App\Http\Controllers\API\Modules\AuthModule\AuthController;
+use App\Http\Controllers\API\Modules\BloodPressureModule\BloodPressureController;
+use App\Http\Controllers\API\Modules\PatientModule\PatientController;
 use App\Http\Controllers\API\VitalSignController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,3 +44,4 @@ Route::get('/recent-patients', [PatientController::class, "RecentPatients"]);
 Route::get('/status-distribution', [PatientController::class, "DistributionBPStatus"]);
 Route::get('/patients/{uuid}', [PatientController::class, "GetPatientByUUID"]);
 Route::get('/blood-pressure-data/{id}', [PatientController::class, "GetPatientBloodPressureData"]);
+Route::get('/vital-sign-data/{id}', [PatientController::class, "GetPatientVitalSignData"]);

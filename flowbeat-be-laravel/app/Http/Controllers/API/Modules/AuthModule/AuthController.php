@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Modules\AuthModule;
 
 use App\Http\Controllers\Controller;
 use App\Models\PatientModel;
