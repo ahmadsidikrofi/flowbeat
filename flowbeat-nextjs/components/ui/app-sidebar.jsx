@@ -76,8 +76,8 @@ export function AppSidebar() {
                                 <div className="flex flex-col items-center w-full">
                                     <div className={`w-full flex ${Sidebar.isCollapsed ? 'flex-col items-center' : 'flex-row justify-between items-center'}`}>
                                         <SidebarMenuButton>
-                                            <Hospital className="w-4 h-4" />
-                                            {!Sidebar.isCollapsed && <span className="font-semibold text-xl">Flowbeat</span>}
+                                            <Hospital className="w-4 h-4 text-blue-500" />
+                                            {!Sidebar.isCollapsed && <span className="font-semibold text-xl text-blue-500">Flowbeat</span>}
                                         </SidebarMenuButton>
                                         {!Sidebar.isCollapsed && <SidebarTrigger />}
                                     </div>

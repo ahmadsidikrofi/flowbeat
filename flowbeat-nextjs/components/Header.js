@@ -21,12 +21,12 @@ const Header = ({ leftTitle, rightTitle, description, icon }) => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle className="text-3xl">{leftTitle}</CardTitle>
+              <CardTitle className="text-3xl text-blue-500">{leftTitle}</CardTitle>
               <CardDescription>{description}</CardDescription>
             </div>
-            <div className="flex items-center">
-              {icon}
-              <CardTitle className="ml-2 text-xl">{rightTitle}</CardTitle>
+            <div className="flex items-center max-sm:hidden">
+              <p className="text-blue-600">{icon}</p>
+              <CardTitle className="ml-2 text-xl text-blue-600">{rightTitle}</CardTitle>
             </div>
           </div>
         </CardHeader>

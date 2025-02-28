@@ -20,8 +20,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import TableSkeleton from "./Skeleton/TableSkeleton";
 
 const PatientList = () => {
+  const [ isTableMounted, setIsTableMounted ] = useState(true)
   const [patients, setPatients] = useState([])
   const [sortColumn, setSortColumn] = useState("")
   const [sortDirection, setSortDirection] = useState("asc")
@@ -38,6 +40,10 @@ const PatientList = () => {
         if (data.success) {
           setPatients(data.patients.data)
           setTotalPages(data.patients.last_page)
+          setIsTableMounted(true)
+          setTimeout(() => {
+              setIsTableMounted(false)
+          }, 1000)
         }
       } catch (error) {
         console.error("Error fetching patients:", error)
@@ -97,82 +103,84 @@ const PatientList = () => {
         </Button>
       </div>
       <div className="rounded-md border max-sm:max-w-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">MRN</TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
-                Nama{" "}
-                {sortColumn === "name" &&
-                  (sortDirection === "asc" ? (
-                    <ChevronUp className="inline h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="inline h-4 w-4" />
-                  ))}
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("age")}>
-                Usia{" "}
-                {sortColumn === "age" &&
-                  (sortDirection === "asc" ? (
-                    <ChevronUp className="inline h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="inline h-4 w-4" />
-                  ))}
-              </TableHead>
-              <TableHead>Tekanan Darah Terakhir</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Terakhir Diperiksa</TableHead>
-              <TableHead className="text-right">Menus</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedPatients.map((patient) => {
-              const lastBP = patient.health_data.length > 0
-                ? `${patient.health_data[0].sys}/${patient.health_data[0].dia}`
-                : "N/A";
-              const status = patient.health_data.length > 0 ? patient.health_data[0].status : "Tidak ada data"
+        {isTableMounted ? (<TableSkeleton />) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">MRN</TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
+                  Nama{" "}
+                  {sortColumn === "name" &&
+                    (sortDirection === "asc" ? (
+                      <ChevronUp className="inline h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="inline h-4 w-4" />
+                    ))}
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort("age")}>
+                  Usia{" "}
+                  {sortColumn === "age" &&
+                    (sortDirection === "asc" ? (
+                      <ChevronUp className="inline h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="inline h-4 w-4" />
+                    ))}
+                </TableHead>
+                <TableHead>Tekanan Darah Terakhir</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Terakhir Diperiksa</TableHead>
+                <TableHead className="text-right">Menus</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedPatients.map((patient) => {
+                const lastBP = patient.health_data.length > 0
+                  ? `${patient.health_data[0].sys}/${patient.health_data[0].dia}`
+                  : "N/A";
+                const status = patient.health_data.length > 0 ? patient.health_data[0].status : "Tidak ada data"
 
-              return (
-                <TableRow key={patient.id}>
-                  <TableCell className="font-medium">{patient.uuid.length > 3 ? `${patient.uuid.substring(0, 3)}...` : patient.uuid}</TableCell>
+                return (
+                  <TableRow key={patient.id}>
+                    <TableCell className="font-medium">{patient.uuid.length > 3 ? `${patient.uuid.substring(0, 3)}...` : patient.uuid}</TableCell>
+                      <TableCell>
+                        <Button variant="link" className="p-0" onClick={() => router.push(`/patients/${patient.uuid}`)}>
+                          {`${patient.first_name} ${patient.last_name || ""}`}
+                        </Button>
+                      </TableCell>
+                    <TableCell>{patient.age || "♾️"}</TableCell>
+                    <TableCell>{lastBP}</TableCell>
                     <TableCell>
-                      <Button variant="link" className="p-0" onClick={() => router.push(`/patients/${patient.uuid}`)}>
-                        {`${patient.first_name} ${patient.last_name || ""}`}
-                      </Button>
+                      <Badge className={`${getStatusColor(status)} text-white`}>{status}</Badge>
                     </TableCell>
-                  <TableCell>{patient.age || "♾️"}</TableCell>
-                  <TableCell>{lastBP}</TableCell>
-                  <TableCell>
-                    <Badge className={`${getStatusColor(status)} text-white`}>{status}</Badge>
-                  </TableCell>
-                  <TableCell>{getLastCheckupTime(patient.health_data)}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Menu</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(patient.uuid.toString())}>
-                          Salin MRN Pasien
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <Button variant="link" asChild onClick={() => router.push(`/patients/${patient.uuid}`)}>
-                          <DropdownMenuItem>Detail pasien</DropdownMenuItem>
-                        </Button>
-                        <Button asChild>
-                          <DropdownMenuItem>Laporkan!</DropdownMenuItem>
-                        </Button>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                    <TableCell>{getLastCheckupTime(patient.health_data)}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(patient.uuid.toString())}>
+                            Salin MRN Pasien
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <Button variant="link" asChild onClick={() => router.push(`/patients/${patient.uuid}`)}>
+                            <DropdownMenuItem>Detail pasien</DropdownMenuItem>
+                          </Button>
+                          <Button asChild>
+                            <DropdownMenuItem>Laporkan!</DropdownMenuItem>
+                          </Button>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button

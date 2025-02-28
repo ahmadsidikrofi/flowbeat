@@ -18,6 +18,7 @@ const DashboardContainer = () => {
     const [ notCheckedToday, setNotCheckedToday ] = useState(0)
     const [ recentPatients, setRecentPatients ] = useState([])
     const [ distributionByStatus, setDistributionByStatus ] = useState([])
+    const [ isDataMounted, setIsDataMounted ] = useState(true)
     const CountPatient = async () => {
         const [patientsRes, statusRes, recentRes, distributionRes] = await Promise.all([
             axios.get('http://127.0.0.1:8000/api/patients'),
@@ -35,6 +36,7 @@ const DashboardContainer = () => {
         setDistributionByStatus(distributionRes.data.data)
     }
     useEffect(() => {
+        setTimeout(() => {setIsDataMounted(false)}, 1500)
         CountPatient()
     }, [])
     return (
@@ -70,7 +72,7 @@ const DashboardContainer = () => {
             </div>
             <div className="lg:flex gap-2 items-start my-8">
                 <div className="flex flex-col gap-4">
-                    <DistributionBloodPressureChart distributionByStatus={distributionByStatus}/>
+                    <DistributionBloodPressureChart distributionByStatus={distributionByStatus} isDataMounted={isDataMounted}/>
                     <ChartBarItem />
                 </div>
                 <div className="space-y-2 max-sm:mt-8 sm:mt-8 lg:mt-0 lg:w-1/2">

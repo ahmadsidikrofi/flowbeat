@@ -13,13 +13,20 @@ import { useEffect, useState } from "react";
 const DetailPatientPage = () => {
     const { uuid } = useParams()
     const [ patient, setPatient ] = useState([])
+    const [ patientHealthData, setPatientHealthData ] = useState([])
     const [ lastVisit, setLastVisit ] = useState('')
     const [ bloodPressureData, setBloodPressureData ] = useState([])
+    const [ VitalSignData, setVitalSignData ] = useState([])
+    const [ currentPage, setCurrentPage ] = useState(1)
+    const [ totalPages, setTotalPages ] = useState(1)
+    const [ isDataMounted, setIsDataMounted ] = useState(true)
     
     const getDetailData = async () => {
-        const res = await axios.get(`http://127.0.0.1:8000/api/patients/${uuid}`)
+        const res = await axios.get(`http://127.0.0.1:8000/api/patients/${uuid}?page=${currentPage}`)
         setPatient(res.data?.patient_data)
+        setPatientHealthData(res.data?.health_data)
         setLastVisit(res.data?.lastVisit)
+        setTotalPages(res.data?.health_data.last_page)
     }
 
     const fetchBPData = async () => {
@@ -28,12 +35,20 @@ const DetailPatientPage = () => {
         setBloodPressureData(res.data)
     }
 
+    const fetchVitalData = async () => {
+        if (!patient?.id) return
+        const res = await axios.get(`http://127.0.0.1:8000/api/vital-sign-data/${patient?.id}?`)
+        setVitalSignData(res.data)
+    }
+
     useEffect(() => {
+        setTimeout(() => {setIsDataMounted(false)}, 3000)
         getDetailData()
         if (patient?.id) {
             fetchBPData()
+            fetchVitalData()
         }
-    }, [patient?.id])
+    }, [patient?.id, currentPage])
 
     return (
         <main className="pr-4 py-2 h-full flex flex-col">
@@ -55,8 +70,8 @@ const DetailPatientPage = () => {
             </div>
             <Separator className="max-w-screen-2xl" />
             <div className="flex gap-4 py-4 w-full xl:flex-row sm:flex-col  max-sm:flex-col">
-                <ProfileDataPatient patient={patient} lastVisit={lastVisit}/>
-                <MedicalHistory patient={patient} bloodPressureData={bloodPressureData} />
+                <ProfileDataPatient patient={patient} lastVisit={lastVisit} isDataMounted={isDataMounted}/>
+                <MedicalHistory currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages}  patientHealthData={patientHealthData} bloodPressureData={bloodPressureData} VitalSignData={VitalSignData} isDataMounted={isDataMounted} />
             </div>
         </main>
     );
