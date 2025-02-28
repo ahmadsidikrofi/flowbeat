@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Modules\PatientModule;
 
 use App\Http\Controllers\Controller;
+use App\Models\BloodPressureModel;
 use App\Models\PatientModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -88,39 +89,40 @@ class PatientController extends Controller
     public function GetPatientByUUID($uuid)
     {
         Carbon::setLocale('id');
-        $cacheKey = "patient_data_{$uuid}";
+        $page = request('page', 1);
+        $cacheKey = "patient_data_{$uuid}_page_{$page}";
 
-        $patient = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($uuid) {
-            return  PatientModel::select('id', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 'gender', 'address', 'height', 'weight', 'created_at')
-            ->with(['healthData' => function ($query) {
-                $query->select('id', 'patient_id', 'sys', 'dia', 'bpm', 'mov', 'ihb', 'status', 'device', 'created_at')
-                      ->orderBy('created_at', 'desc');
-            }])->where('uuid', $uuid)->first();
-        });
+        return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($uuid) {
+            $patient = PatientModel::select('id', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 'gender', 'address', 'height', 'weight', 'created_at')
+            ->where('uuid', $uuid)->first();
+            if (!$patient) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pasien not found'
+                ], 404);
+            }
 
-        if ($patient) {
+            $healthData = BloodPressureModel::where('patient_id', $patient->id)
+            ->select('id', 'patient_id', 'sys', 'dia', 'bpm', 'mov', 'ihb', 'status', 'device', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
             $formattedPatient = $patient->toArray();
             $formattedPatient['created_at'] = $patient->created_at->isoFormat('dddd, D MMMM Y');
-            $formattedPatient['health_data'] = $patient->healthData->map(function ($item) {
-                return [
-                    ...$item->toArray(),
-                    'created_at' => $item->created_at->isoFormat('D MMM Y'),
-                ];
+            $formattedHealthData = $healthData->toArray();
+            $formattedHealthData['data'] = collect($formattedHealthData['data'])->map(function ($item) {
+                $item['created_at'] = Carbon::parse($item['created_at'])->isoFormat('D MMM Y');
+                return $item;
             });
-
             return response()->json([
                 'success' => true,
                 'patient_data' => $formattedPatient,
-                'lastVisit' => optional($patient->healthData->first())->created_at
-                    ? $patient->healthData->first()->created_at->diffForHumans()
+                'health_data' => $formattedHealthData,
+                'lastVisit' => optional($healthData->first())->created_at
+                    ? Carbon::parse($healthData->first()->created_at)->diffForHumans()
                     : '-'
             ], 200);
-        } else {
-            return response()->json([
-                'success' => false,
-                'patient_data' => 'Pasien tidak ditemukan'
-            ], 404);
-        }
+        });
     }
 
     public function DistributionBPStatus()
