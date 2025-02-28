@@ -9,9 +9,12 @@ import ControlDelayDropdown from "../ControlDelayLayer/ControlDelayDropdown"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import { Button } from "../ui/button"
 import HealthInsight from "./HealthInsight"
+import { useState } from "react"
 import TableSkeleton from "../Skeleton/TableSkeleton"
 
 const MedicalHistory = ({ patientHealthData, bloodPressureData, VitalSignData, currentPage, setCurrentPage, totalPages, isDataMounted }) => {
+  const [ isTableMounted, setIsTableMounted ] = useState(true)
+  setTimeout(() => setIsTableMounted(false), 3000)
   return (
     <div className="space-y-4 flex-1">
       <ControlDelayDropdown />
@@ -35,7 +38,7 @@ const MedicalHistory = ({ patientHealthData, bloodPressureData, VitalSignData, c
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
-          {isDataMounted ? (<TableSkeleton />) : (
+          {isTableMounted ? (<TableSkeleton />) : (
             <Table className="w-full">
               <TableHeader>
                 <TableRow className="bg-gray-100">

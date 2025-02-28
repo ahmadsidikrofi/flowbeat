@@ -71,7 +71,7 @@ const DetailPatientPage = () => {
             <Separator className="max-w-screen-2xl" />
             <div className="flex gap-4 py-4 w-full xl:flex-row sm:flex-col  max-sm:flex-col">
                 <ProfileDataPatient patient={patient} lastVisit={lastVisit} isDataMounted={isDataMounted}/>
-                <MedicalHistory currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages}  patientHealthData={patientHealthData} bloodPressureData={bloodPressureData} VitalSignData={VitalSignData} isDataMounted={isDataMounted} />
+                <MedicalHistory currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages}  patientHealthData={patientHealthData} bloodPressureData={bloodPressureData} VitalSignData={VitalSignData} setIsDataMounted={setIsDataMounted} isDataMounted={isDataMounted} />
             </div>
         </main>
     );
