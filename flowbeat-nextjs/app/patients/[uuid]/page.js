@@ -1,6 +1,7 @@
 'use client'
 import Header from "@/components/Header";
 import MedicalHistory from "@/components/PatientDetails/Medical History";
+import PatientNotes from "@/components/PatientDetails/PatientNotes";
 import ProfileDataPatient from "@/components/PatientDetails/ProfileDataPatient";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -69,9 +70,16 @@ const DetailPatientPage = () => {
                 </Button>
             </div>
             <Separator className="max-w-screen-2xl" />
-            <div className="flex gap-4 py-4 w-full xl:flex-row sm:flex-col  max-sm:flex-col">
-                <ProfileDataPatient patient={patient} lastVisit={lastVisit} isDataMounted={isDataMounted}/>
-                <MedicalHistory currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages}  patientHealthData={patientHealthData} bloodPressureData={bloodPressureData} VitalSignData={VitalSignData} setIsDataMounted={setIsDataMounted} isDataMounted={isDataMounted} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 py-4">
+                <div className="lg:col-span-1">
+                    <div className="space-y-6">
+                        <ProfileDataPatient patient={patient} lastVisit={lastVisit} isDataMounted={isDataMounted}/>
+                        <PatientNotes patientId={patient?.id} />
+                    </div>
+                </div>
+                <div className="lg:col-span-2">
+                    <MedicalHistory currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages}  patientHealthData={patientHealthData} bloodPressureData={bloodPressureData} VitalSignData={VitalSignData} setIsDataMounted={setIsDataMounted} isDataMounted={isDataMounted} />
+                </div>
             </div>
         </main>
     );
