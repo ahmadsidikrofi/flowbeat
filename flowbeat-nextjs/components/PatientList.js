@@ -74,6 +74,8 @@ const PatientList = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case "Rendah":
+        return "bg-blue-500"
       case "Normal":
         return "bg-green-500"
       case "Normal Tinggi":

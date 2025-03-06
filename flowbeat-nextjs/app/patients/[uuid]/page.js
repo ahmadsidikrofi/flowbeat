@@ -1,7 +1,7 @@
 'use client'
 import Header from "@/components/Header";
 import MedicalHistory from "@/components/PatientDetails/Medical History";
-import PatientNotes from "@/components/PatientDetails/PatientNotes";
+import PatientNotes from "@/components/Notes/PatientNotes";
 import ProfileDataPatient from "@/components/PatientDetails/ProfileDataPatient";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -74,7 +74,7 @@ const DetailPatientPage = () => {
                 <div className="lg:col-span-1">
                     <div className="space-y-6">
                         <ProfileDataPatient patient={patient} lastVisit={lastVisit} isDataMounted={isDataMounted}/>
-                        <PatientNotes patientId={patient?.id} />
+                        <PatientNotes patientUUID={uuid} />
                     </div>
                 </div>
                 <div className="lg:col-span-2">
