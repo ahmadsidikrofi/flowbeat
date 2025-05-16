@@ -9,6 +9,7 @@ import {
     Edit,
     Filter,
     X,
+    Trash,
 } from "lucide-react"
 import {
     Dialog,
@@ -23,16 +24,19 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
 import AddNotes from "./AddNotes"
 import axios from "axios"
+import DeleteNote from "./DeleteNote"
 
 const PatientNotes = ({ patientUUID }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [isEditMode, setIsEditMode] = useState(false)
+    const [isConfirmationDelete, setIsConfirmationDelete] = useState(false)
     const [currentNote, setCurrentNote] = useState(null)
     const [filterCategory, setFilterCategory] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedDate, setSelectedDate] = useState()
     const [showFilters, setShowFilters] = useState(false)
     const [notes, setNotes] = useState([])
+    const [refreshData, setRefreshData] = useState(false)
 
     const GetNotesFromDB = async () => {
        const res = await axios.get(`http://127.0.0.1:8000/api/notes/${patientUUID}`)
@@ -40,7 +44,7 @@ const PatientNotes = ({ patientUUID }) => {
     }
     useEffect(() => {
         GetNotesFromDB()
-    }, [])
+    }, [refreshData])
 
     const handleOpenDialog = (note) => {
         if (note) {
@@ -60,8 +64,8 @@ const PatientNotes = ({ patientUUID }) => {
         setIsOpen(true)
     }
 
-    const handleDeleteNote = (id) => {
-        setNotes(notes.filter((note) => note.id !== id))
+    const handleConfirmationDeleteDialog = () => {
+        setIsConfirmationDelete(true)
     }
 
     const getCategoryColor = (category) => {
@@ -194,7 +198,7 @@ const PatientNotes = ({ patientUUID }) => {
                                 Tambah Catatan
                             </Button>
                         </DialogTrigger>
-                        <AddNotes patientUUID={patientUUID} notes={notes} setNotes={setNotes} isEditMode={isEditMode} setIsEditMode={setIsEditMode} setCurrentNote={setCurrentNote} currentNote={currentNote} setIsOpen={setIsOpen}/>
+                        <AddNotes setRefreshData={setRefreshData} patientUUID={patientUUID} notes={notes} setNotes={setNotes} isEditMode={isEditMode} setIsEditMode={setIsEditMode} setCurrentNote={setCurrentNote} currentNote={currentNote} setIsOpen={setIsOpen}/>
                     </Dialog>
                 </div>
             </CardHeader>
@@ -223,9 +227,14 @@ const PatientNotes = ({ patientUUID }) => {
                                         <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(note)} className="h-8 w-8">
                                             <Edit className="h-4 w-4 text-blue-500" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteNote(note.id)} className="h-8 w-8">
-                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                        </Button>
+                                        <Dialog open={isConfirmationDelete} onOpenChange={setIsConfirmationDelete}>
+                                            <DialogTrigger asChild>
+                                                <Button variant="ghost" size="icon" onClick={() => handleConfirmationDeleteDialog()} className="h-8 w-8">
+                                                    <Trash className="h-4 w-4 text-red-500" />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DeleteNote setIsConfirmationDelete={setIsConfirmationDelete} noteId={note.id} setNotes={setNotes} notes={notes}/>
+                                        </Dialog>
                                     </div>
                                 </div>
                                 <p className="text-sm mt-2 whitespace-pre-line">{note.content}</p>

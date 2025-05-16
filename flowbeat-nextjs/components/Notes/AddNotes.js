@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Button } from "../ui/button";
 import axios from "axios";
 
-const AddNotes = ({ notes, setNotes, isEditMode, setIsEditMode, currentNote, setCurrentNote, setIsOpen, patientUUID }) => {
+const AddNotes = ({ setRefreshData, notes, setNotes, isEditMode, setIsEditMode, currentNote, setCurrentNote, setIsOpen, patientUUID }) => {
     const StoreNoteToDB = async (note) => {
         try {
             const response = await axios.post(`http://127.0.0.1:8000/api/notes/${patientUUID}`, note, {
@@ -38,24 +38,32 @@ const AddNotes = ({ notes, setNotes, isEditMode, setIsEditMode, currentNote, set
 
         let newNote = {
             ...currentNote,
-            date: format(now, "yyyy-MM-dd")
-        }
-        if (!isEditMode) {
-            newNote = {
-                ...newNote,
-                id: Math.max(0, ...notes.map((n) => n.id)) + 1 
-            }
+            created_at: format(now, "yyyy-MM-dd")
         }
 
         const savedNote = await StoreNoteToDB(newNote)
         if (savedNote) {
-            if (isEditMode) setNotes(notes.map((note) => note.id === currentNote.id ? savedNote : note))
-            else {
-                [savedNote, ...notes]
-            }
+            setRefreshData((prev) => !prev)
+            setIsOpen(false);
+            resetForm();
+        }
+    }
+
+    const handleUpdateNoteToDB = async () => {
+        if (!currentNote || !currentNote.id) return
+        const updatedNote = {
+            title: currentNote.title,
+            content: currentNote.content,
+            category: currentNote.category,
+            tags: currentNote.tags, 
+        }
+        await axios.put(`http://127.0.0.1:8000/api/notes/${currentNote.id}`, updatedNote)
+        .then((res) => {
+            console.log("Note updated:", res.data)
+            setRefreshData((prev) => !prev)
             setIsOpen(false)
             resetForm()
-        }
+        }).catch((error) => {console.log("Terjadi error: ", error)})
     }
 
     const handleAddTag = (tag) => {
@@ -182,7 +190,7 @@ const AddNotes = ({ notes, setNotes, isEditMode, setIsEditMode, currentNote, set
                 >
                     Batal
                 </Button>
-                <Button type="submit" onClick={handleSaveNote}>
+                <Button type="submit" onClick={isEditMode ? handleUpdateNoteToDB : handleSaveNote}>
                     <Save className="mr-2 h-4 w-4" />
                     {isEditMode ? "Perbarui Catatan" : "Simpan Catatan"}
                 </Button>

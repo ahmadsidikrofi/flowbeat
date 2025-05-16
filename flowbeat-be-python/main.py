@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, WebSocketDisconnect, WebSocket
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import asyncio
 from bleak import BleakClient, BleakScanner

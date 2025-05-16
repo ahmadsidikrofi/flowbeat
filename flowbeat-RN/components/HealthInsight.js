@@ -37,22 +37,23 @@ const HealthInsight = ({ latestBP, latestBPFromDB }) => {
     }
 
     const { message, color } = userToken ?  getHealthInsight(latestBPFromDB?.sys, latestBPFromDB?.dia) : getHealthInsight(latestBP?.sys, latestBP?.dia)
-    return (
-        <>
-            <HealthInsightInformation insightInformation={insightInformation} setInsightInformation={setInsightInformation}/>
-            <TouchableOpacity onPress={() => setInsightInformation(true)}>
-                <Card style={{ backgroundColor: '#fff', padding: 16, marginVertical: 16 }} accessible={true}>
-                    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center', marginBottom: 16}}>
+    return (<>
+        <HealthInsightInformation insightInformation={insightInformation} setInsightInformation={setInsightInformation} />
+        <TouchableOpacity onPress={() => setInsightInformation(true)}>
+            <Card style={{ backgroundColor: '#fff', marginVertical: 16 }} accessible={true}>
+                <Card.Content>
+                    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center', marginBottom: 16 }}>
                         <Text variant="headlineSmall">Wawasan Kesehatan</Text>
                         <Ionicons name={"arrow-forward-outline"} size={28} />
                     </View>
                     <View style={{ backgroundColor: color + "20", padding: 18, borderRadius: 8 }}>
-                        <Text style={{ color: `${color}`, fontSize: 20, fontWeight: '800', lineHeight: 30  }} variant="bodyLarge">{message}</Text>
+                        <Text style={{ color: `${color}`, fontSize: 20, fontWeight: '800', lineHeight: 30 }} variant="bodyLarge">{message}</Text>
                         <BarBPIndicator systolic={userToken ? latestBPFromDB?.sys : latestBP?.sys} diastolic={userToken ? latestBPFromDB?.dia : latestBP?.dia} />
                     </View>
-                </Card>
-            </TouchableOpacity>
-        </>
+                </Card.Content>
+            </Card>
+        </TouchableOpacity>
+    </>
     )
 }
 export default HealthInsight;

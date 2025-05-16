@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ProfilePatientSkeleton from "../Skeleton/ProfilePatientSkeleton";
-const ProfileDataPatient = ({ patient, lastVisit, isDataMounted }) => {
-
+const ProfileDataPatient = ({ patient, lastVisit, isDataMounted, patientHealthData}) => {
     const getStatusColor = (status) => {
         switch (status) {
             case "Rendah":
@@ -55,8 +54,8 @@ const ProfileDataPatient = ({ patient, lastVisit, isDataMounted }) => {
                     </div>
                     <div>
                         <p className="text-sm font-medium">Status</p>
-                        <Badge className={`${getStatusColor(patient?.health_data?.[0].status || '--')} text-white`}>
-                            {patient?.health_data?.[0].status || '--'}
+                        <Badge className={`${getStatusColor(patientHealthData.data?.[0]?.status || '--')} text-white`}>
+                            {patientHealthData.data?.[0]?.status || '--'}
                         </Badge>
                     </div>
                     <div>
