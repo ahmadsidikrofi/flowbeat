@@ -95,6 +95,81 @@ class BloodPressureController extends Controller
         ], 201);
     }
 
+    public function calculateStatus($sys, $dia)
+    {
+        if ($sys < 90 || $dia < 60) return "Rendah";
+        if ($sys <= 120 && $dia <= 80) return "Normal";
+        if (($sys > 120 && $sys < 140) || ($dia > 80 && $dia < 90)) return "Normal Tinggi";
+        return "Hipertensi Tinggi";
+    }
+
+    public function BloodPressureRateLimit( Request $request, $id )
+    {
+        $status = $this->calculateStatus($request->sys, $request->dia);
+        $delay = 10;
+        $lastSent = Cache::get("rate_limit_last_sent_{$id}");
+
+        if ($lastSent && now()->diffInSeconds($lastSent) < $delay) {
+            return response()->json([
+                'message' => 'Rate limit active. Data not stored.',
+                'status' => $status
+            ], 429);
+        }
+        Cache::put("rate_limit_last_sent_{$id}", now(), $delay);
+        return response()->json([
+                'message' => 'Rate limit inactive. Data stored.',
+                'status' => $status
+            ], 201);
+    }
+
+    public function BloodPressureBatching( Request $request, $id )
+    {
+        $batchSize = 5;
+        $status = $this->calculateStatus($request->sys, $request->dia);
+        $key = "batch_buffer_{$status}";
+        $buffer = Cache::get($key, []);
+        $buffer[] = [
+            'patient_id' => $id,
+            'sys' => $request->sys,
+            'dia' => $request->dia,
+            'bpm' => $request->bpm,
+            'mov' => $request->mov,
+            'ihb' => $request->ihb,
+            'status' => $status,
+            'device' => $request->device,
+            'created_at' => now(),
+        ];
+
+        Cache::put($key, $buffer, now()->addMinutes(5));
+        // Log::info("BATCHING ONLY - Buffered data for status {$status}", $buffer);
+
+        // Flush jika buffer sudah cukup
+        if (count($buffer) >= $batchSize) {
+            $this->flushBuffer($key, $status);
+        }
+
+        return response()->json([
+            'message' => 'Data buffered for batching.',
+            'status' => $status,
+        ], 202);
+    }
+
+    protected function flushBuffer($key, $status)
+    {
+        $buffer = Cache::pull($key);
+
+        if (!$buffer || count($buffer) === 0) {
+            // Log::info("BATCHING ONLY - No data to flush for status {$status}");
+            return;
+        }
+
+        foreach ($buffer as $data) {
+            BloodPressureModel::create($data);
+        }
+
+        // Log::info("BATCHING ONLY - Flushed " . count($buffer) . " record(s) to DB for status {$status}");
+    }
+
     public function ReadLatestBloodPressureData()
     {
         if (Auth::check()) {

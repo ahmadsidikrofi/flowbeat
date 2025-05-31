@@ -25,7 +25,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/sign-out', [AuthController::class, "SignOutPatient"]);
 
     // Blood Pressure Mobile Endpoints
+    // Transmission Data Strategy Endpoints
     Route::post('/patient-bp-data/{id}', [BloodPressureController::class, "StoreBloodPressure"]);
+    Route::post('/patient-bp-rate-limit/{id}', [BloodPressureController::class, "BloodPressureRateLimit"]);
+    Route::post('/patient-bp-batching/{id}', [BloodPressureController::class, "BloodPressureBatching"]);
+
     Route::get('/latest-bp-data', [BloodPressureController::class, "ReadLatestBloodPressureData"]);
     Route::get('/track-bp-data', [BloodPressureController::class, "ReadHistoryBloodPressure"]);
     Route::get('/track-bp-data/{id}', [BloodPressureController::class, "ReadHistoryBloodPressureByID"]);
