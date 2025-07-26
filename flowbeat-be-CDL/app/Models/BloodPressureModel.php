@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BloodPressureModel extends Model
 {
-    protected $table = 'patient_blood_pressure';
+    protected $table = 'blood_pressure_measurements';
     protected $guarded = [];
 
     public function patient()

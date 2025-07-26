@@ -54,21 +54,28 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'single')),
+            // 'channels' => explode(',', env('LOG_STACK', 'single')),
+            'channels' => ['single', 'daily'],
             'ignore_exceptions' => false,
         ],
 
         'single' => [
             'driver' => 'single',
-            'path' => storage_path('logs/laravel.log'),
+            // 'path' => storage_path('logs/laravel.log'),
+            // 'level' => env('LOG_LEVEL', 'debug'),
+            'path' => storage_path(env('LOG_SINGLE_PATH', 'logs/laravel.log')),
             'level' => env('LOG_LEVEL', 'debug'),
+            'permissions' => 0775,
             'replace_placeholders' => true,
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
+            // 'path' => storage_path('logs/laravel.log'),
+            // 'level' => env('LOG_LEVEL', 'debug'),
+            'path' => storage_path(env('LOG_DAILY_PATH', 'logs/laravel.log')),
             'level' => env('LOG_LEVEL', 'debug'),
+            'permissions' => 0775,
             'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
         ],

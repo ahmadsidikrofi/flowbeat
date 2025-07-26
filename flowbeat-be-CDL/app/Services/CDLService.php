@@ -2,54 +2,71 @@
 
 namespace App\Services;
 
+use App\Events\BloodPressureDataEvent;
 use App\Models\BloodPressureModel;
+use App\Services\CDL\CDLTransmissionRuleInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CDLService
 {
-    protected $intervals = [
-        'Rendah' => 15,
-        'Hipertensi Tinggi' => 15,
-        'Normal Tinggi' => 30,
-        'Normal' => 60,
-    ];
-    public function isAllowedToSend($status, $patientId)
-    {
-        $delay = $this->intervals[$status] ?? 60;
-        $lastSent = Cache::get("cdl_last_sent_{$patientId}");
+    protected CDLTransmissionRuleInterface $transmissionRule;
 
-        // Memeriksa apakah data terakhir dikirim dalam waktu yang kurang dari batas waktu tertunda
-        if ($lastSent && now()->diffInSeconds($lastSent) < $delay) {
-            return false;
+    public function __construct(CDLTransmissionRuleInterface $transmissionRule)
+    {
+        $this->transmissionRule = $transmissionRule;
+    }
+
+    public function isAllowedToSend($patientId, array $requestData): bool
+    {
+
+        $status = $this->transmissionRule->calculateStatus($requestData);
+        $intervals = $this->transmissionRule->getIntervals();
+
+        $lock = Cache::lock("lock_patient_{$patientId}");
+
+        if ($lock->get()) {
+            try {
+                // $delay = $this->intervals[$status] ?? 60;
+                $delay = $intervals[$status] ?? 60;
+                $lastSent = Cache::get("cdl_last_sent_{$patientId}");
+                // Memeriksa apakah data terakhir dikirim dalam waktu yang kurang dari batas waktu tertunda
+                if ($lastSent && now()->diffInSeconds($lastSent) < $delay) {
+                    return false;
+                }
+                Cache::put("cdl_last_sent_{$patientId}", now(), $delay);
+                return true;
+            } finally {
+                $lock->release();
+            }
         }
-        Cache::put("cdl_last_sent_{$patientId}", now(), $delay);
-        return true;
+        return false;
+
     }
 
-    public function calculateStatus($sys, $dia)
+    public function bufferData(array $data)
     {
-        if ($sys < 90 || $dia < 60) return "Rendah";
-        if ($sys <= 120 && $dia <= 80) return "Normal";
-        if (($sys > 120 && $sys < 140) || ($dia > 80 && $dia < 90)) return "Normal Tinggi";
-        return "Hipertensi Tinggi";
+        $status = $this->transmissionRule->calculateStatus($data);
+        $this->transmissionRule->handleBuffering($status, $data, $this);
+
+        // $key = "cdl_buffer_{$status}";
+        // $buffer = Cache::get($key, []);
+        // $buffer[] = $data;
+        // if (count($buffer) > 5) {
+        //     $this->flushBufferedData($status);
+        //     return;
+        // }
+        // Cache::put($key, $buffer, now()->addHours(1));
+
+        // Log::info("CDL BUFFER - Data buffered for status {$status}", $data);
     }
 
-    public function bufferData($status, $data)
+    public function bufferDataWithStatus(string $bufferStatus, array $data): void
     {
-        $key = "cdl_buffer_{$status}";
-        $buffer = Cache::get($key, []);
-        $buffer[] = $data;
-        if (count($buffer) > 5) {
-            $this->flushBufferedData($status);
-            return;
-        }
-        Cache::put($key, $buffer, now()->addMinute(5));
-
-        Log::info("CDL BUFFER - Data buffered for status {$status}", $data);
+        $this->transmissionRule->handleBuffering($bufferStatus, $data, $this);
     }
 
-    public function flushBufferedData($status)
+    public function flushBufferedData($status, $modelClass)
     {
         $key = "cdl_buffer_{$status}";
         $buffer = Cache::pull($key);
@@ -59,8 +76,14 @@ class CDLService
             return;
         }
 
-        foreach ($buffer as $data) {
-            BloodPressureModel::create($data);
+        $patientIdsToClear = [];
+        $patientIdsToClear = array_unique(array_column($buffer, 'patient_id'));
+        // BloodPressureModel::insert($buffer);
+        $modelClass::insert($buffer);
+
+        foreach ($patientIdsToClear as $patientId) {
+            Cache::forget("bp_data_{$patientId}");
+            BloodPressureDataEvent::dispatch($patientId); // Teriak ada data baru buat pasien ini
         }
 
         Log::info("CDL FLUSH - Flushed " . count($buffer) . " record(s) to DB for status {$status}");

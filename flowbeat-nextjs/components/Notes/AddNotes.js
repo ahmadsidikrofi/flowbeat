@@ -13,12 +13,12 @@ import { Save, X } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
-import axios from "axios";
+import apiClient from "@/lib/api-client";
 
 const AddNotes = ({ setRefreshData, notes, setNotes, isEditMode, setIsEditMode, currentNote, setCurrentNote, setIsOpen, patientUUID }) => {
     const StoreNoteToDB = async (note) => {
         try {
-            const response = await axios.post(`http://127.0.0.1:8000/api/notes/${patientUUID}`, note, {
+            const response = await apiClient.post(`/patients/${patientUUID}/notes`, note, {
                 headers: {'Accept': 'application/json'}
             })
             return response.data
@@ -57,7 +57,7 @@ const AddNotes = ({ setRefreshData, notes, setNotes, isEditMode, setIsEditMode, 
             category: currentNote.category,
             tags: currentNote.tags, 
         }
-        await axios.put(`http://127.0.0.1:8000/api/notes/${currentNote.id}`, updatedNote)
+        await apiClient.put(`/notes/${currentNote.id}`, updatedNote)
         .then((res) => {
             console.log("Note updated:", res.data)
             setRefreshData((prev) => !prev)

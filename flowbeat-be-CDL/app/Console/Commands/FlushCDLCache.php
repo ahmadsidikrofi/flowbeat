@@ -2,7 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Models\BloodPressureModel;
 use App\Models\PatientModel;
+use App\Models\VitalSignModel;
+use App\Services\CDL\BpmTransmissionRule;
+use App\Services\CDL\Max30100TransmissionRule;
+use App\Services\CDL\OmronTransmissionRule;
+use App\Services\CDL\SpO2TransmissionRule;
 use App\Services\CDLService;
 use Illuminate\Console\Command;
 
@@ -27,13 +33,27 @@ class FlushCDLCache extends Command
      */
     public function handle()
     {
-        // $patientIds = PatientModel::pluck('id');
-        $statuses = ['Normal', 'Normal Tinggi', 'Rendah', 'Hipertensi Tinggi'];
-        $CDLService = new CDLService();
+        $this->info('Starting CDL buffer flush...');
 
-        foreach( $statuses as $status ) {
-            $CDLService->flushBufferedData($status);
+        $rules = [
+            new OmronTransmissionRule(),
+            new BpmTransmissionRule(),
+            new SpO2TransmissionRule(),
+        ];
+        $statusToModelMap = [];
+
+        foreach ($rules as $rule) {
+            $statuses = array_keys($rule->getIntervals());
+            foreach($statuses as $status) {
+                $statusToModelMap[$status] = $rule->getModelClass();
+            }
         }
+
+        $cdlService = new CDLService(new OmronTransmissionRule());
+        foreach ($statusToModelMap as $status => $model) {
+            $cdlService->flushBufferedData($status, $model);
+        }
+
         $this->info("CDL Buffered Flushed.");
     }
 }

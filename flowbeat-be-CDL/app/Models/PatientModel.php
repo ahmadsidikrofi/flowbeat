@@ -15,6 +15,11 @@ class PatientModel extends Authenticatable
     protected $table = "patients";
     protected $guarded = [];
 
+    public function doctors()
+    {
+        return $this->belongsTo(DoctorModel::class);
+    }
+
     public function healthData()
     {
         return $this->hasMany(BloodPressureModel::class, 'patient_id');

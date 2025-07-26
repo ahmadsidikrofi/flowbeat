@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers\API\Modules\BloodPressureModule;
 
+use App\Events\BloodPressureDataEvent;
 use App\Http\Controllers\Controller;
 use App\Models\BloodPressureModel;
+use App\Models\PatientEWSScore;
 use App\Models\PatientModel;
+use App\Models\VitalSignModel;
+use App\Services\CDL\OmronTransmissionRule;
 use App\Services\CDLService;
+use App\Services\EWSService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class BloodPressureController extends Controller
 {
@@ -59,76 +65,12 @@ class BloodPressureController extends Controller
 
     public function StoreBloodPressure( Request $request, $id )
     {
-        $cdl = new CDLService();
-        $status = $cdl->calculateStatus($request->sys, $request->dia);
-        if (!$cdl->isAllowedToSend($status, $id)) {
-            $cdl->bufferData($status, [
-                'patient_id' => $id,
-                'sys' => $request->sys,
-                'dia' => $request->dia,
-                'bpm' => $request->bpm,
-                'mov' => $request->mov,
-                'ihb' => $request->ihb,
-                'status' => $status,
-                'device' => $request->device,
-                'created_at' => now(),
-            ]);
-            return response()->json(['message' => 'Health Data Saved & Buffered'], 202);
-        }
-
-        BloodPressureModel::create([
-            'patient_id' => $id,
-            'sys' => $request->sys,
-            'dia' => $request->dia,
-            'bpm' => $request->bpm,
-            'mov' => $request->mov,
-            'ihb' => $request->ihb,
-            'status' => $status,
-            'device' => $request->device,
-        ]);
-        return response()->json([
-            'message' => 'Health data successfully stored',
-            'sys' => $request->sys,
-            'dia' => $request->dia,
-            'status' => $status,
-            'device' => $request->device,
-        ], 201);
-    }
-
-    public function calculateStatus($sys, $dia)
-    {
-        if ($sys < 90 || $dia < 60) return "Rendah";
-        if ($sys <= 120 && $dia <= 80) return "Normal";
-        if (($sys > 120 && $sys < 140) || ($dia > 80 && $dia < 90)) return "Normal Tinggi";
-        return "Hipertensi Tinggi";
-    }
-
-    public function BloodPressureRateLimit( Request $request, $id )
-    {
-        $status = $this->calculateStatus($request->sys, $request->dia);
-        $delay = 10;
-        $lastSent = Cache::get("rate_limit_last_sent_{$id}");
-
-        if ($lastSent && now()->diffInSeconds($lastSent) < $delay) {
-            return response()->json([
-                'message' => 'Rate limit active. Data not stored.',
-                'status' => $status
-            ], 429);
-        }
-        Cache::put("rate_limit_last_sent_{$id}", now(), $delay);
-        return response()->json([
-                'message' => 'Rate limit inactive. Data stored.',
-                'status' => $status
-            ], 201);
-    }
-
-    public function BloodPressureBatching( Request $request, $id )
-    {
-        $batchSize = 5;
-        $status = $this->calculateStatus($request->sys, $request->dia);
-        $key = "batch_buffer_{$status}";
-        $buffer = Cache::get($key, []);
-        $buffer[] = [
+        $rule = new OmronTransmissionRule();
+        $cdl = new CDLService($rule);
+        $status = $rule->calculateStatus($request->all());
+        // $status = $cdl->calculateStatus($request->sys, $request->dia);
+        $patient = PatientModel::where('id', $id)->first();
+        $requestData = [
             'patient_id' => $id,
             'sys' => $request->sys,
             'dia' => $request->dia,
@@ -138,36 +80,62 @@ class BloodPressureController extends Controller
             'status' => $status,
             'device' => $request->device,
             'created_at' => now(),
+            'updated_at' => now(),
         ];
+        if (!$cdl->isAllowedToSend($id, $requestData)) {
+            $cdl->bufferData($requestData);
+            return response()->json([
+                'message' => 'Health Data Saved & Buffered',
+                'status' => $status,
+                'cache_ttl' => Cache::get("cdl_buffer_{$status}"),
+            ], 202);
+        }
 
-        Cache::put($key, $buffer, now()->addMinutes(5));
-        // Log::info("BATCHING ONLY - Buffered data for status {$status}", $buffer);
+        $newBpData = $patient->healthData()->create([
+            'patient_id' => $id,
+            'sys' => $request->sys,
+            'dia' => $request->dia,
+            'bpm' => $request->bpm,
+            'mov' => $request->mov,
+            'ihb' => $request->ihb,
+            'status' => $status,
+            'device' => $request->device,
+        ]);
 
-        // Flush jika buffer sudah cukup
-        if (count($buffer) >= $batchSize) {
-            $this->flushBuffer($key, $status);
+        $cacheKey = "bp_data_{$id}";
+        Cache::forget($cacheKey);
+        BloodPressureDataEvent::dispatch($id);
+
+        $latestVitalSign = VitalSignModel::where('patient_id', $id)
+            ->where('created_at', '>=', now()->subMinutes(15))
+            ->latest()
+            ->first();
+
+        if ( $latestVitalSign ) {
+            $ewsService = new EWSService();
+            list( $totalScore, $riskLevel ) = $ewsService->calculateEWS(
+                $newBpData->sys,
+                $latestVitalSign->bpm,
+                $latestVitalSign->spo2
+            );
+            PatientEWSScore::create([
+                'patient_id' => $id,
+                'bp_measurement_id' => $newBpData->id,
+                'oximetry_measurement_id' => $latestVitalSign->id,
+                'total_score' => $totalScore,
+                'risk_level' => $riskLevel,
+            ]);
         }
 
         return response()->json([
-            'message' => 'Data buffered for batching.',
-            'status' => $status,
-        ], 202);
-    }
-
-    protected function flushBuffer($key, $status)
-    {
-        $buffer = Cache::pull($key);
-
-        if (!$buffer || count($buffer) === 0) {
-            // Log::info("BATCHING ONLY - No data to flush for status {$status}");
-            return;
-        }
-
-        foreach ($buffer as $data) {
-            BloodPressureModel::create($data);
-        }
-
-        // Log::info("BATCHING ONLY - Flushed " . count($buffer) . " record(s) to DB for status {$status}");
+            'message' => 'Health data successfully stored',
+            'patient_name' => $patient->first_name . " " . $patient->last_name,
+            'patient_id' => $id,
+            'sys' => $newBpData->sys,
+            'dia' => $newBpData->dia,
+            'status' => $newBpData->status,
+            'device' => $newBpData->device,
+        ], 201);
     }
 
     public function ReadLatestBloodPressureData()

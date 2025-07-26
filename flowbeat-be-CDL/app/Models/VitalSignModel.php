@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class VitalSignModel extends Model
 {
-    protected $table = 'patient_vitals';
+    protected $table = 'oximetry_measurements';
     protected $guarded = [];
 
     public function patient()

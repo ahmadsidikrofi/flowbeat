@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\PatientModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PatientModel>
@@ -17,15 +19,17 @@ class PatientModelFactory extends Factory
      */
     public function definition(): array
     {
+        $faker = Faker::create('id_ID');
+
         return [
-            'uuid' => $this->faker->uuid,
-            'first_name' => $this->faker->firstName,
-            'last_name' => $this->faker->lastName,
-            'phone_number' => $this->faker->unique()->phoneNumber,
-            'password' => '1234567',
-            'address' => $this->faker->address,
-            'height' => $this->faker->numberBetween(150, 200),
-            'weight' => $this->faker->numberBetween(50, 100),
+            'uuid' => $faker->uuid,
+            'first_name' => $faker->firstName,
+            'last_name' => $faker->lastName,
+            'phone_number' => '085' . $faker->numberBetween(1000000000, 9999999999),
+            'password' => Hash::make('1234567'),
+            'address' => $faker->address,
+            'height' => $faker->numberBetween(150, 200),
+            'weight' => $faker->numberBetween(50, 100),
         ];
     }
 }

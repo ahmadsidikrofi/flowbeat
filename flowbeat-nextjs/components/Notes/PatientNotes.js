@@ -23,8 +23,8 @@ import { format } from "date-fns"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
 import AddNotes from "./AddNotes"
-import axios from "axios"
 import DeleteNote from "./DeleteNote"
+import apiClient from "@/lib/api-client"
 
 const PatientNotes = ({ patientUUID }) => {
     const [isOpen, setIsOpen] = useState(false)
@@ -39,7 +39,7 @@ const PatientNotes = ({ patientUUID }) => {
     const [refreshData, setRefreshData] = useState(false)
 
     const GetNotesFromDB = async () => {
-       const res = await axios.get(`http://127.0.0.1:8000/api/notes/${patientUUID}`)
+       const res = await apiClient.get(`/patients/${patientUUID}/notes`)
        setNotes(res.data.data)
     }
     useEffect(() => {

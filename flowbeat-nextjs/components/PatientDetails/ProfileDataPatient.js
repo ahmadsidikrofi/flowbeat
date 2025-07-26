@@ -18,7 +18,7 @@ const ProfileDataPatient = ({ patient, lastVisit, isDataMounted, patientHealthDa
     };
 
     return (
-        <Card className="h-[46rem] max-sm:w-full">
+        <Card className="h-full max-sm:w-full">
             <CardHeader>
                 <CardTitle className="text-xl">Informasi Pasien</CardTitle>
             </CardHeader>

@@ -9,6 +9,8 @@ import RecentPatientsTable from "./RecentPatientTable";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DistributionBloodPressureChart from "./DistributionBloodPressureChart"
+import { useAuth } from "@clerk/nextjs";
+import apiClient, { setupAuthInterceptor } from "@/lib/api-client";
 
 const DashboardContainer = () => {
     const [ patientCount, setPatientCount ] = useState(0)
@@ -19,12 +21,19 @@ const DashboardContainer = () => {
     const [ recentPatients, setRecentPatients ] = useState([])
     const [ distributionByStatus, setDistributionByStatus ] = useState([])
     const [ isDataMounted, setIsDataMounted ] = useState(true)
+    const { getToken } = useAuth()
+    useEffect(() => {
+        setTimeout(() => {setIsDataMounted(false)}, 1500)
+        CountPatient()
+        setupAuthInterceptor(getToken)
+    }, [getToken])
+
     const CountPatient = async () => {
         const [patientsRes, statusRes, recentRes, distributionRes] = await Promise.all([
-            axios.get('http://127.0.0.1:8000/api/patients'),
-            axios.get('http://127.0.0.1:8000/api/patient-status'),
-            axios.get('http://127.0.0.1:8000/api/recent-patients'),
-            axios.get('http://127.0.0.1:8000/api/status-distribution')
+            apiClient.get('/patients'),
+            apiClient.get('/patients/summary/status'),
+            apiClient.get('/patients/recent'),
+            apiClient.get('/patients/statistics/distribution')
         ]);
 
         setPatientCount(statusRes.data.total_patient)
@@ -35,10 +44,6 @@ const DashboardContainer = () => {
         setRecentPatients(recentRes.data.recent_patients)
         setDistributionByStatus(distributionRes.data.data)
     }
-    useEffect(() => {
-        setTimeout(() => {setIsDataMounted(false)}, 1500)
-        CountPatient()
-    }, [])
     return (
         <main className="pr-4 py-2 h-full flex flex-col">
             <Header
@@ -47,8 +52,8 @@ const DashboardContainer = () => {
                 description="Pantau pasien dengan cepat"
                 icon={<LayoutDashboardIcon />}
             />
-            <Separator className="my-8 max-w-screen-2xl" />
-            <div className="grid lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 gap-8 flex-grow">
+            <Separator className="my-2 max-w-screen-2xl" />
+            <div className="grid lg:grid-cols-4 md:grid-cols-3 max-sm:grid-cols-2 gap-2 flex-grow">
                 <CardStatus
                     title="Total Pasien"
                     description="+20% dari bulan lalu"
@@ -70,7 +75,7 @@ const DashboardContainer = () => {
                     value={checkedToday}
                 />
             </div>
-            <div className="lg:flex gap-2 items-start my-8">
+            <div className="lg:flex gap-2 items-start my-4">
                 <div className="flex flex-col gap-4">
                     <DistributionBloodPressureChart distributionByStatus={distributionByStatus} isDataMounted={isDataMounted}/>
                     <ChartBarItem />

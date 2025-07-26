@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Modules\BloodPressureModule;
 
+use App\Events\BloodPressureStored;
 use App\Http\Controllers\Controller;
 use App\Models\BloodPressureModel;
 use App\Models\PatientModel;
@@ -76,7 +77,7 @@ class BloodPressureController extends Controller
             } else {
                 $status = "Hipertensi Tinggi";
             }
-            usleep(500000);
+            // usleep(100000);
             $patient->healthData()->create([
                 'sys' => $sys,
                 'dia' => $dia,
@@ -87,6 +88,19 @@ class BloodPressureController extends Controller
                 'status' => $status,
                 'patient_id' => $patient->id,
             ]);
+
+            event(new BloodPressureStored([
+                'patient_id' => $patient->id,
+                'name' => $patient->first_name . ' ' . $patient->last_name,
+                'sys' => $sys,
+                'dia' => $dia,
+                'bpm' => $bpm,
+                'mov' => $mov,
+                'ihb' => $ihb,
+                'device' => $device,
+                'status' => $status,
+                'timestamp' => now(),
+            ]));
 
             return response()->json([
                 'message' => 'Health data successfully stored',

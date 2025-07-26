@@ -62,23 +62,27 @@ class PatientController extends Controller
     public function RecentPatients()
     {
         Carbon::setLocale('id');
-        $recentPatients = PatientModel::whereHas('healthData')
-        ->with(['healthData' => function ($query) {
-            $query->latest();
-        }])->whereHas('healthData', function ($query) {
-            $query->orderBy('created_at', 'desc');
-        })->take(5)->get()->map(function ($patient) {
-            return [
-                'id' => $patient->id,
-                'first_name' => $patient->first_name,
-                'last_name' => $patient->last_name,
-                'lastBP' => optional($patient->healthData->first())->sys . '/' . optional($patient->healthData->first())->dia,
-                'status' => optional($patient->healthData->first())->status,
-                'lastVisit' => optional($patient->healthData->first())->created_at
-                    ? optional($patient->healthData->first())->created_at->diffForHumans()
-                    : '-'
-            ];
-        });
+        $recentPatients = PatientModel::select('patients.*')
+            ->join('blood_pressure_measurements', 'patients.id', '=', 'blood_pressure_measurements.patient_id')
+            ->groupBy('patients.id')
+            ->orderByRaw('MAX(blood_pressure_measurements.created_at) DESC') // Urutkan berdasarkan tanggal terbaru dari blood_pressure_measurements
+            ->with(['healthData' => function ($query) { // Ambil relasi healthData terbaru untuk di-map
+                $query->latest();
+            }])
+            ->take(10)
+            ->get()
+            ->map(function ($patient) {
+                return [
+                    'id' => $patient->id,
+                    'first_name' => $patient->first_name,
+                    'last_name' => $patient->last_name,
+                    'lastBP' => optional($patient->healthData->first())->sys . '/' . optional($patient->healthData->first())->dia,
+                    'status' => optional($patient->healthData->first())->status,
+                    'lastVisit' => optional($patient->healthData->first())->created_at
+                        ? optional($patient->healthData->first())->created_at->diffForHumans()
+                        : '-'
+                ];
+            });
 
         return response()->json([
             'success' => true,
@@ -94,18 +98,18 @@ class PatientController extends Controller
 
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($uuid) {
             $patient = PatientModel::select('id', 'first_name', 'last_name', 'phone_number', 'date_of_birth', 'gender', 'address', 'height', 'weight', 'created_at')
-            ->where('uuid', $uuid)->first();
+                ->where('uuid', $uuid)->first();
             if (!$patient) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Pasien not found'
+                    'message' => 'Patient not found'
                 ], 404);
             }
 
             $healthData = BloodPressureModel::where('patient_id', $patient->id)
-            ->select('id', 'patient_id', 'sys', 'dia', 'bpm', 'mov', 'ihb', 'status', 'device', 'created_at')
-            ->orderBy('created_at', 'desc')
-            ->paginate(5);
+                ->select('id', 'patient_id', 'sys', 'dia', 'bpm', 'mov', 'ihb', 'status', 'device', 'created_at')
+                ->orderBy('created_at', 'desc')
+                ->paginate(5);
 
             $formattedPatient = $patient->toArray();
             $formattedPatient['created_at'] = $patient->created_at->isoFormat('dddd, D MMMM Y');
@@ -133,22 +137,22 @@ class PatientController extends Controller
             $data = [];
             $today = Carbon::today();
             // loop 5 last week
-            for ($i = 4; $i >=0; $i--) {
+            for ($i = 4; $i >= 0; $i--) {
                 $startOfWeek = $today->copy()->subWeeks($i)->startOfWeek(); // senin
                 $endOfWeek = $today->copy()->subWeeks($i)->endOfWeek(); // minggu
                 $normal = PatientModel::whereHas('healthData', function ($query) use ($startOfWeek, $endOfWeek) {
                     $query->whereBetween('created_at', [$startOfWeek, $endOfWeek])
-                          ->where('status', 'Normal');
+                        ->where('status', 'Normal');
                 })->count();
 
                 $prehypertension = PatientModel::whereHas('healthData', function ($query) use ($startOfWeek, $endOfWeek) {
                     $query->whereBetween('created_at', [$startOfWeek, $endOfWeek])
-                          ->where('status', 'Normal Tinggi');
+                        ->where('status', 'Normal Tinggi');
                 })->count();
 
                 $hypertension = PatientModel::whereHas('healthData', function ($query) use ($startOfWeek, $endOfWeek) {
                     $query->whereBetween('created_at', [$startOfWeek, $endOfWeek])
-                          ->where('status', 'Hipertensi Tinggi');
+                        ->where('status', 'Hipertensi Tinggi');
                 })->count();
                 $data[] = [
                     'date' => $startOfWeek->format('d M'),
@@ -173,13 +177,13 @@ class PatientController extends Controller
             return PatientModel::with(['healthData' => function ($query) {
                 $query->orderBy('created_at', 'asc');
             }])->findOrFail($id)->healthData
-            ->map(function ($record) {
-                return [
-                    'date' => $record->created_at->format('Y-m-d'),
-                    'systolic' => $record->sys,
-                    'diastolic' => $record->dia,
-                ];
-            });
+                ->map(function ($record) {
+                    return [
+                        'date' => $record->created_at->format('Y-m-d'),
+                        'systolic' => $record->sys,
+                        'diastolic' => $record->dia,
+                    ];
+                });
         });
         return response()->json($data, 200);
     }
@@ -191,13 +195,13 @@ class PatientController extends Controller
             return PatientModel::with(["vitalsData" => function ($query) {
                 $query->orderBy('created_at', 'asc');
             }])->findOrFail($id)->vitalsData
-            ->map(function ($record) {
-                return [
-                    'date' => $record->created_at->format('Y-m-d'),
-                    'bpm' => $record->bpm,
-                    'spo2' => $record->spo2
-                ];
-            });
+                ->map(function ($record) {
+                    return [
+                        'date' => $record->created_at->format('Y-m-d'),
+                        'bpm' => $record->bpm,
+                        'spo2' => $record->spo2
+                    ];
+                });
         });
         return response()->json($data, 200);
     }

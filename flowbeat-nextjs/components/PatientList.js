@@ -21,6 +21,7 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import TableSkeleton from "./Skeleton/TableSkeleton";
+import apiClient from "@/lib/api-client";
 
 const PatientList = () => {
   const [ isTableMounted, setIsTableMounted ] = useState(true)
@@ -35,8 +36,8 @@ const PatientList = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/patients?page=${currentPage}`)
-        const data = await response.json()
+        const response = await apiClient(`/patients?page=${currentPage}`)
+        const data = await response.data
         if (data.success) {
           setPatients(data.patients.data)
           setTotalPages(data.patients.last_page)
@@ -104,14 +105,14 @@ const PatientList = () => {
           Filter <ChevronDown className="ml-2 h-4" />
         </Button>
       </div>
-      <div className="rounded-md border max-sm:max-w-md">
+      <div className="rounded-md border max-sm:max-w-[88vw]">
         {isTableMounted ? (<TableSkeleton />) : (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[100px]">MRN</TableHead>
                 <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
-                  Nama{" "}
+                  Nama{" "} {sortDirection === 'asc' ? <ChevronUp className="inline h-4 w-4" /> : null}
                   {sortColumn === "name" &&
                     (sortDirection === "asc" ? (
                       <ChevronUp className="inline h-4 w-4" />
@@ -119,7 +120,7 @@ const PatientList = () => {
                       <ChevronDown className="inline h-4 w-4" />
                     ))}
                 </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort("age")}>
+                <TableHead className="cursor-pointer w-4" onClick={() => handleSort("age")}>
                   Usia{" "}
                   {sortColumn === "age" &&
                     (sortDirection === "asc" ? (
@@ -129,9 +130,10 @@ const PatientList = () => {
                     ))}
                 </TableHead>
                 <TableHead>Tekanan Darah Terakhir</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Terakhir Diperiksa</TableHead>
-                <TableHead className="text-right">Menus</TableHead>
+                <TableHead className="w-40">Denyut terakhir</TableHead>
+                <TableHead className="w-40">Spo2</TableHead>
+                <TableHead className="">Terakhir Diperiksa</TableHead>
+                <TableHead className="text-right w-[96px] ">Menus</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -143,7 +145,7 @@ const PatientList = () => {
 
                 return (
                   <TableRow key={patient.id}>
-                    <TableCell className="font-medium">{patient.uuid.length > 3 ? `${patient.uuid.substring(0, 3)}...` : patient.uuid}</TableCell>
+                    <TableCell className="font-medium">...{patient.uuid.slice(-5)}</TableCell>
                       <TableCell>
                         <Button variant="link" className="p-0" onClick={() => router.push(`/patients/${patient.uuid}`)}>
                           {`${patient.first_name} ${patient.last_name || ""}`}
@@ -151,9 +153,11 @@ const PatientList = () => {
                       </TableCell>
                     <TableCell>{patient.age || "♾️"}</TableCell>
                     <TableCell>{lastBP}</TableCell>
-                    <TableCell>
+                    <TableCell>{lastBP}</TableCell>
+                    <TableCell>{lastBP}</TableCell>
+                    {/* <TableCell>
                       <Badge className={`${getStatusColor(status)} text-white`}>{status}</Badge>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>{getLastCheckupTime(patient.health_data)}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

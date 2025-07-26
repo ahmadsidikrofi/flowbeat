@@ -40,10 +40,18 @@ return [
             'driver' => 'session',
             'provider' => 'patients',
         ],
+        // 'api' => [
+        //     'driver' => 'sanctum',
+        //     'provider' => 'patients',
+        // ],
         'api' => [
             'driver' => 'sanctum',
             'provider' => 'patients',
         ],
+        // 'clerk-api' => [
+        //     'driver' => 'clerk',
+        //     'provider' => 'doctors',
+        // ],
     ],
 
     /*
@@ -68,7 +76,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\PatientModel::class,
         ],
-
+        // 'doctors' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\DoctorModel::class,
+        // ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

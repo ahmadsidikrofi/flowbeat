@@ -1,6 +1,6 @@
 import DashboardContainer from "@/components/Dashboard";
 
-export default function Home() {
+export default function DashboardPage() {
   return (
     <div>
       <DashboardContainer />

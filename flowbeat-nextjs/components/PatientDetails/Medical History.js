@@ -64,9 +64,11 @@ const MedicalHistory = ({ patientHealthData, bloodPressureData, VitalSignData, c
                           <TooltipTrigger asChild>
                             {healthData.mov ? <UsersRound className="h-4 text-red-500" /> : <Dot className="h-4 text-gray-400" />}
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Terdeteksi pergerakan tubuh ketika pemeriksaan</p>
-                          </TooltipContent>
+                          {healthData.mov === 1 && (
+                            <TooltipContent>
+                              <p>Terdeteksi pergerakan tubuh ketika pemeriksaan</p>
+                            </TooltipContent>
+                          )}
                         </Tooltip>
                       </TooltipProvider>
                     </TableCell>
@@ -76,9 +78,11 @@ const MedicalHistory = ({ patientHealthData, bloodPressureData, VitalSignData, c
                           <TooltipTrigger asChild>
                             {healthData.ihb ? <HeartPulse className="h-4 text-red-500" /> : <Dot className="h-4 text-gray-400" />}
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Jantung tidak berdenyut dengan lancar</p>
-                          </TooltipContent>
+                          {healthData.ihb === 1 && (
+                            <TooltipContent>
+                              <p>Jantung tidak berdenyut dengan lancar</p>
+                            </TooltipContent>
+                          )}
                         </Tooltip>
                       </TooltipProvider>
                     </TableCell>

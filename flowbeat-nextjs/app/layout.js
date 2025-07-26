@@ -17,15 +17,8 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`antialiased ${poppins.className} h-screen flex`}>
-          <header className="flex justify-end items-center p-4 gap-4 h-16">
-          </header>
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="flex-1 flex flex-col h-full">
-              {children}
-            </main>
-          </SidebarProvider>
+        <body className={`antialiased ${poppins.className} h-screen flex items-center justify-center`}>
+          {children}
         </body>
       </html>
     </ClerkProvider>

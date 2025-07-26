@@ -35,19 +35,87 @@ const TableSkeleton = () => {
             <TableBody>
                 <TableRow className="text-left max-sm:text-[12px]">
                     <TableCell className="p-5">
-                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 w-3/4" />
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 w-24" />
                     </TableCell>
                     <TableCell>
-                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50" />
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
                     </TableCell>
                     <TableCell>
-                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50" />
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
                     </TableCell>
                     <TableCell>
-                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50" />
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
                     </TableCell>
                     <TableCell>
-                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50" />
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                </TableRow>
+                <TableRow className="text-left max-sm:text-[12px]">
+                    <TableCell className="p-5">
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 w-24" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                </TableRow>
+                <TableRow className="text-left max-sm:text-[12px]">
+                    <TableCell className="p-5">
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 w-24" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                </TableRow>
+                <TableRow className="text-left max-sm:text-[12px]">
+                    <TableCell className="p-5">
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 w-24" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                </TableRow>
+                <TableRow className="text-left max-sm:text-[12px]">
+                    <TableCell className="p-5">
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 w-24" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
+                    </TableCell>
+                    <TableCell>
+                        <Skeleton className="h-4 inset-0 bg-gradient-to-br from-transparent to-blue-500/50 text-right w-48" />
                     </TableCell>
                 </TableRow>
             </TableBody>

@@ -5,11 +5,13 @@ import PatientNotes from "@/components/Notes/PatientNotes";
 import ProfileDataPatient from "@/components/PatientDetails/ProfileDataPatient";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import axios from "axios";
 import { ArrowLeft, Edit, Pen } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useref } from "react";
+import apiClient from "@/lib/api-client";
+import { createEchoInstance } from "@/lib/echo";
+import { useAuth } from "@clerk/nextjs";
 
 const DetailPatientPage = () => {
     const { uuid } = useParams()
@@ -21,9 +23,11 @@ const DetailPatientPage = () => {
     const [ currentPage, setCurrentPage ] = useState(1)
     const [ totalPages, setTotalPages ] = useState(1)
     const [ isDataMounted, setIsDataMounted ] = useState(true)
+    const echoRef = useRef(null)
+    const auth = useAuth()
 
     const getDetailData = useCallback(async () => {
-            const res = await axios.get(`http://127.0.0.1:8000/api/patients/${uuid}?page=${currentPage}`)
+            const res = await apiClient.get(`/patients/${uuid}?page=${currentPage}`)
             setPatient(res.data?.patient_data)
             setPatientHealthData(res.data?.health_data)
             setLastVisit(res.data?.lastVisit)
@@ -32,14 +36,14 @@ const DetailPatientPage = () => {
 
     const fetchBPData = useCallback(async () => {
             if (!patient?.id) return
-            const res = await axios.get(`http://127.0.0.1:8000/api/blood-pressure-data/${patient.id}`)
+            const res = await apiClient.get(`/patients/${patient.id}/blood-pressures`)
             setBloodPressureData(res.data)
     }, [patient?.id]) 
 
     const fetchVitalData = useCallback(
         async () => {
             if (!patient?.id) return
-            const res = await axios.get(`http://127.0.0.1:8000/api/vital-sign-data/${patient?.id}?`)
+            const res = await apiClient.get(`/patients/${patient.id}/vital-signs`)
             setVitalSignData(res.data)
     }, [patient?.id]) 
 
@@ -50,16 +54,37 @@ const DetailPatientPage = () => {
             fetchBPData()
             fetchVitalData()
         }
-    }, [patient?.id, currentPage])
-    
+    }, [patient?.id, currentPage, getDetailData])
+
     useEffect(() => {
-        if (!patient?.id) return
-        const intervalId = setInterval(() => {
-            fetchBPData();
-            console.log("iam called");
-        }, 5000)
-        return () => clearInterval(intervalId)
-    }, [patient?.id, fetchBPData])
+        if (!patient?.id || ! auth.isLoaded) return 
+
+        const setupWebSocket = async () => {
+            try {
+                const echo = createEchoInstance(auth);
+                echoRef.current = echo;
+                
+                console.log(`🚀 Terhubung dan mendengarkan di channel: patient.${patient.id}`);
+                echo.channel(`patient.${patient.id}`)
+                    .listen('.BloodPressureDataEvent', (data) => {
+                        console.log('✅ EVENT REAL-TIME DITERIMA!', data);
+                        fetchBPData();
+                    });
+
+
+            } catch (error) {
+                console.error('WebSocket setup error:', error);
+            }
+        };
+        setupWebSocket();
+        
+        return () => {
+            if (echoRef.current) {
+                echoRef.current.leave(`patient.${patient.id}`);
+            }
+        };
+        
+    }, [patient?.id, auth.isLoaded, auth, fetchBPData])
 
     return (
         <main className="pr-4 py-2 h-full flex flex-col">
@@ -80,9 +105,9 @@ const DetailPatientPage = () => {
                 </Button>
             </div>
             <Separator className="max-w-screen-2xl" />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 py-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 py-4">
                 <div className="lg:col-span-1">
-                    <div className="space-y-6">
+                    <div className="space-y-3">
                         <ProfileDataPatient patientHealthData={patientHealthData} patient={patient} lastVisit={lastVisit} isDataMounted={isDataMounted}/>
                         <PatientNotes patientUUID={uuid} />
                     </div>
