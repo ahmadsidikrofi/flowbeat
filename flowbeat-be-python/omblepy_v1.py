@@ -318,8 +318,7 @@ async def scanBLEDevices():
     from bleak import BleakScanner
     devices = await BleakScanner.discover()
     return [
-        # {"id": idx, "mac": dev.address, "name": dev.name or "Unknown", "rssi": dev.rssi}
-        {"id": idx, "mac": dev.address, "name": dev.name or "Unknown", "rssi": getattr(dev, 'rssi', None)}
+        {"id": idx, "mac": dev.address, "name": dev.name or "Unknown", "rssi": dev.rssi}
         for idx, dev in enumerate(devices)
     ]
 
@@ -418,6 +417,4 @@ async def main():
                 logger.error("You can find the upstream issue at: https://github.com/hbldh/bleak/issues/641")
                 logger.error(f"AssertionError details: {e}")
 
-# Hanya jalankan main() jika file ini dieksekusi langsung
-if __name__ == "__main__":
-    asyncio.run(main())
+# asyncio.run(main())
