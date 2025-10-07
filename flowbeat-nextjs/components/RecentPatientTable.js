@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Badge } from "./ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
-import TableSkeleton from "./Skeleton/TableSkeleton"
+import { Loader2 } from "lucide-react"
 
 const getStatusColor = (status) => {
   if (status === "Rendah") {
@@ -30,7 +30,7 @@ const RecentPatientsTable = ({ recentPatients }) => {
         <CardDescription className="">Daftar pasien yang baru diperiksa</CardDescription>
       </CardHeader>
       <CardContent>
-        {isTableMounted ? (<TableSkeleton />) : (
+        {isTableMounted ? (<Loader2 className="size-10 animate-spin" />) : (
           <Table>
             <TableHeader>
               <TableRow>

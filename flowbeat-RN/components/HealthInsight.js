@@ -43,7 +43,7 @@ const HealthInsight = ({ latestBP, latestBPFromDB }) => {
             <Card style={{ backgroundColor: '#fff', marginVertical: 16 }} accessible={true}>
                 <Card.Content>
                     <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center', marginBottom: 16 }}>
-                        <Text variant="headlineSmall">Wawasan Kesehatan</Text>
+                        <Text variant="headlineSmall">Wawasan kesehatan</Text>
                         <Ionicons name={"arrow-forward-outline"} size={28} />
                     </View>
                     <View style={{ backgroundColor: color + "20", padding: 18, borderRadius: 8 }}>

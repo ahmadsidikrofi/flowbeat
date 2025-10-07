@@ -105,7 +105,7 @@ const SignUp = ({ setSignUpModal, setSignInModal }) => {
                     <ThemedText style={{ color: '#ef4444', paddingHorizontal: 10, marginTop: 10, fontSize: 13 }}>{error}</ThemedText>
                 </ThemedView>
             </ThemedView>
-            <ThemedView style={{ position: 'absolute', bottom: 20, left: 100 }}>
+            <ThemedView style={{ alignItems: 'center', marginTop: 'auto', paddingBottom: 20 }}>
                 <ThemedView style={{ flexDirection: 'col', justifyContent: 'center', alignItems: 'center', gap: 20 }}>
                     <TouchableOpacity onPress={handleSignUpPatient} style={{ padding: 10, width: 250, borderRadius: 15, borderWidth: 0.1, elevation: 2, backgroundColor: '#fff' }}>
                         {isLoading ? (

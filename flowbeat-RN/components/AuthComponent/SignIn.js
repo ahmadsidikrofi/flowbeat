@@ -65,7 +65,7 @@ const SignIn = ({ setSignInModal, setAuthModal }) => {
                     <ThemedText style={{ color: '#475569', textAlign: 'center', marginTop: 40, fontSize: 18, fontWeight: '500' }}>Reset Password?</ThemedText>
                 </ThemedView>
             </ThemedView>
-            <ThemedView style={{ position: 'absolute', bottom: 20, left: 100 }}>
+            <ThemedView style={{ width: '100%', alignItems: 'center', marginTop: 'auto', paddingBottom: 20 }}>
                 <ThemedView style={{ flexDirection: 'col', justifyContent: 'center', alignItems: 'center', gap: 20 }}>
                     <TouchableOpacity onPress={handleSignInPatient} style={{ padding: 10, width: 250, borderRadius: 15, borderWidth: 0.1, elevation: 2, backgroundColor: '#fff' }}>
                         {isLoading ? (

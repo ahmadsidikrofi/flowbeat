@@ -7,6 +7,7 @@ import logging
 import os
 json_path = os.path.join('ubpm.json')
 from deviceSpecific.hem_7142t import deviceSpecificDriver
+import datetime
 
 logger              = logging.getLogger("omblepy")
 bleClient           = None
@@ -153,7 +154,8 @@ async def connect_and_read_latest(data: ConnectAndReadInput):
                 await bluetoothTxRxObj.endTransmission()
                 if not records:
                     raise HTTPException(status_code=404, detail="No records found.")
-                latest_record = records[-1][-1] 
+                latest_record = records[-1][-1]
+                latest_record['datetime'] = datetime.datetime.now()
                 return {
                     "message": "Newest record read with success.",
                     "mac_address": selected_device.address,

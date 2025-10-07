@@ -12,7 +12,7 @@ const LatestReadings = ({ title, latestBP,latestBPFromDB,  getBloodPressure, syn
     return ( 
         <View className="mt-8">
             <View style={{ width: '100%',flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
-                <Text style={{ fontSize: 23, fontWeight: '400', flexShrink: 1 }}>{title}</Text>
+                <Text style={{ fontSize: 18, fontWeight: '400', flexShrink: 1 }}>{title}</Text>
                 <TouchableOpacity disabled={syncData || isSuccess === false} onPress={getBloodPressure} style={{ minWidth: 120, padding: 10, borderRadius: 10, borderWidth: 0.1, elevation: 2, backgroundColor: syncData ? '#e5e5e5' : '#2563eb' }} >
                     {syncData ? (
                         <>

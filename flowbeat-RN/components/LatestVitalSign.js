@@ -11,7 +11,7 @@ const VitalSignCard = ({ title, value, unit, isNormal, icon }) => (
         <Card.Content>
             <View style={{ flexDirection: 'row', alignContent:'center', alignItems: 'center', gap: 4 }}>
                 <Ionicons name={icon} size={24} color={isNormal ? "#15A34A" : "#D32F2F"} />
-                <Text variant="titleLarge" style={{ fontWeight: "bold" }}>{title}</Text>
+                <Text variant="titleMedium" style={{ fontWeight: "bold", }}>{title}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignContent:'center', alignItems: 'center', gap: 4 }}>
                 <Text variant="displayLarge" style={{ marginTop: 8, fontWeight: "bold" }}>{value}</Text>
@@ -33,7 +33,7 @@ const LatestVitalSigns = () => {
     const [ latestVitalSign, setLatestVitalSign ] = useState('')
     const LatestVitalSignFromDB = async () => {
         if (userToken) {
-            const res = await axios.get(`${baseURL}/api/latest-vital-data`, {
+            const res = await axios.get(`${baseURL}/api/patients/vital-signs/latest`, {
                 headers: { Authorization: `Bearer ${userToken}` }
             })
             setLatestVitalSign(res.data[0])
@@ -48,7 +48,7 @@ const LatestVitalSigns = () => {
         <View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text variant="titleLarge">
-                    Tanda Vital Terakhir
+                    Tanda vital terbaru
                 </Text>
                 {/* <Button mode="contained" >Sync Data</Button> */}
             </View>
