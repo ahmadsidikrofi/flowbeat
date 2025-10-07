@@ -9,13 +9,12 @@ use Illuminate\Support\Facades\Log;
 
 class OmronTransmissionRule implements CDLTransmissionRuleInterface
 {
-
     public function getIntervals(): array
     {
         $intervals = [
             'Rendah' => 10,
             'Hipertensi Tinggi' => 10,
-            'Normal Tinggi' => 20,
+        'Normal Tinggi' => 20,
             'Normal' => 30,
         ];
         return $intervals;

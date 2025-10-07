@@ -15,7 +15,7 @@ const BPDataByID = ({ setDetailDataVisible, dataById, userToken, refreshData }) 
 
     const handleDeleteData = async ( id ) => {
         if (userToken) {
-            await axios.delete(`${Config.BASE_URL}/api/track-bp-data/${id}`, {
+            await axios.delete(`${Config.BASE_URL}/api/patients/blood-pressures/${id}`, {
                 headers: { Authorization: `Bearer ${userToken}` }
             }).then(async (res) => {
                 setDetailDataVisible(false)
@@ -40,10 +40,9 @@ const BPDataByID = ({ setDetailDataVisible, dataById, userToken, refreshData }) 
                 {/* Pengukuran */}
                 <Card style={{ backgroundColor: '#fff' }}>
                     <Card.Content>
-                        <Text variant="titleSmall" style={{ color: '#2563eb' }}>Pengukuran</Text>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 30 }}>
-                            <Text variant="bodyLarge">Tanggal pengukuran</Text>
-                            <Text variant="bodyLarge">{date}</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30 }}>
+                            <Text variant="titleSmall" style={{ color: '#2563eb' }}>Pengukuran</Text>
+                            <Text variant="titleSmall" style={{ color: '#2563eb' }}>{date}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text variant="bodyLarge">Waktu pengukuran</Text>

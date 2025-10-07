@@ -30,10 +30,10 @@ class BpmTransmissionRule implements CDLTransmissionRuleInterface
         $key = "cdl_buffer_{$status}";
         $buffer = Cache::get($key, []);
         $buffer[] = $data;
-        if (count($buffer) > 5) {
-            $cdlService->flushBufferedData($status, $this->getModelClass());
-            return;
-        }
+        // if (count($buffer) > 5) {
+        //     $cdlService->flushBufferedData($status, $this->getModelClass());
+        //     return;
+        // }
         Cache::put($key, $buffer, now()->addHours(1));
 
         Log::info("BPM BUFFER - Data buffered for status {$status}", $data);

@@ -6,6 +6,8 @@ from omblepy import bluetoothTxRxHandler, scanBLEDevices, appendCsv, saveUBPMJso
 import logging
 import os
 json_path = os.path.join('ubpm.json')
+from deviceSpecific.hem_7142t import deviceSpecificDriver
+import datetime
 import hashlib
 
 # Memastikan driver spesifik tersedia
@@ -233,6 +235,11 @@ async def connect_and_read(data: ConnectAndReadInput):
                     useUnreadCounter=data.new_records_only,
                     syncTime=data.sync_time,
                 )
+                await bluetoothTxRxObj.endTransmission()
+                if not records:
+                    raise HTTPException(status_code=404, detail="No records found.")
+                latest_record = records[-1][-1]
+                latest_record['datetime'] = datetime.datetime.now()
 
                 # HANYA normalize, JANGAN adjust
                 normalized = normalize_records_datetime(records)

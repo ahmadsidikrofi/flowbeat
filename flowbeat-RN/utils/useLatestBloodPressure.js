@@ -8,7 +8,6 @@ import Config from './Config';
 export const useLatestBloodPressure = () => {
     const [refreshing, setRefreshing] = useState(false)
     const [ syncData, setSyncData ] = useState(false)
-    // const { requestPermissions } = useBLE()
     const [ localDataBP, setLocalDataBP ] = useState([])
     const [ latestBPFromDB, setLatestBPFromDB ] = useState('')
     const [ historyDataFromBP, setHistoryDataFromBP ] = useState([])
@@ -17,11 +16,6 @@ export const useLatestBloodPressure = () => {
     const baseURL = Config.BASE_URL
 
     const getBloodPressure = async () => {
-        // const isPermissionsEnabled = requestPermissions();
-        // if (!isPermissionsEnabled) {
-        //     Alert.alert('Permissions Denied', 'Please enable Bluetooth and Location permissions to proceed.');
-        //     return;
-        // }
         try {
             setRefreshing(true)
             setSyncData(true)
@@ -94,7 +88,7 @@ export const useLatestBloodPressure = () => {
         if (userToken) {
             try {
                 const res = await axios.get(
-                    `${baseURL}/api/latest-bp-data`,
+                    `${baseURL}/api/patients/blood-pressure-data/latest`,
                     { headers: { Authorization: `Bearer ${userToken}` } }
                 );
                 setLatestBPFromDB(res.data[0])
@@ -106,7 +100,7 @@ export const useLatestBloodPressure = () => {
         
     const GetAllDataFromDB = async () => {
         if (userToken) {
-            const res = await axios.get(`${baseURL}/api/track-bp-data`,
+            const res = await axios.get(`${baseURL}/api/patients/blood-pressures`,
                 { headers: { Authorization: `Bearer ${userToken}` } }
             )
             // console.log("Response API", res.data);
@@ -121,7 +115,7 @@ export const useLatestBloodPressure = () => {
             LatestDataBloodPressureFromDB()
             GetAllDataFromDB()
         }
-    }, [userToken, latestBPFromDB])
+    }, [userToken])
 
   return {
     refreshing,

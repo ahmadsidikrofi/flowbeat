@@ -32,9 +32,9 @@ class PatientController extends Controller
         $patientStatus = Cache::remember($cacheKey, $cacheTTL, function () {
             $totalPatient = PatientModel::count();
 
-            $latestHealthData = DB::table('patient_blood_pressure as pbps')
+            $latestHealthData = DB::table('blood_pressure_measurements as pbps')
                 ->select('pbps.patient_id', 'pbps.status')
-                ->whereRaw('pbps.created_at = (SELECT MAX(created_at) FROM patient_blood_pressure WHERE patient_id = pbps.patient_id)')
+                ->whereRaw('pbps.created_at = (SELECT MAX(created_at) FROM blood_pressure_measurements WHERE patient_id = pbps.patient_id)')
                 // ->groupBy('pbps.patient_id', 'pbps.status')->get();
                 ->get();
             $normalPatients = $latestHealthData->where('status', 'Normal')->count();

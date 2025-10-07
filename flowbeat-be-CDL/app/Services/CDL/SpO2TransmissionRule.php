@@ -37,10 +37,10 @@ class SpO2TransmissionRule implements CDLTransmissionRuleInterface
         $key = "cdl_buffer_{$status}";
         $buffer = Cache::get($key, []);
         $buffer[] = $data;
-        if (count($buffer) > 5) {
-            $cdlService->flushBufferedData($status, $this->getModelClass());
-            return;
-        }
+        // if (count($buffer) > 5) {
+        //     $cdlService->flushBufferedData($status, $this->getModelClass());
+        //     return;
+        // }
         Cache::put($key, $buffer, now()->addHours(1));
 
         Log::info("SpO2 BUFFER - Data buffered for status {$status}", $data);
