@@ -46,7 +46,7 @@ export default function Notifikasi() {
         </ScrollView>
 
         {/* Tombol Navigasi Kembali */}
-        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
             <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 5 }} />
             <Text style={styles.backText}>KEMBALI</Text>
         </TouchableOpacity>

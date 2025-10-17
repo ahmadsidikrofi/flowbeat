@@ -28,12 +28,12 @@ export default function Akun() {
               <Text style={styles.buttonText}>PERBARUI AKUN</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('/')}>
               <Text style={styles.buttonText}>KELUAR AKUN</Text>
           </TouchableOpacity>
 
           {/* Tombol Navigasi Kembali */}
-          <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
             <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 5 }} />
             <Text style={styles.backText}>KEMBALI</Text>
           </TouchableOpacity>
