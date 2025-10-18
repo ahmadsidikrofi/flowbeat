@@ -1,31 +1,43 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 export default function Notifikasi() {
     const router = useRouter();
+    // 1. Gunakan state untuk menyimpan data notifikasi
+    const [notifikasiList, setNotifikasiList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const notifikasiList = [
-        {
-        id: 1,
-        title: "Info tanda vital",
-        date: "10 Mei 2024 pukul 20.23",
-        content: "Detak jantung dan oksigen sedang kurang baik. Disarankan untuk istirahat sejenak."
-        },
-        {
-        id: 2,
-        title: "Info tanda vital",
-        date: "11 Mei 2024 pukul 09.15",
-        content: "Tekanan darah sedikit tinggi. Cobalah melakukan relaksasi."
-        },
-        {
-        id: 3,
-        title: "Info tanda vital",
-        date: "12 Mei 2024 pukul 07.50",
-        content: "Kondisi stabil. Tetap jaga pola makan dan aktivitas sehat."
-        }
-    ];
+    // 2. Gunakan useEffect untuk mengambil data dari API
+    useEffect(() => {
+        // Tentukan URL API
+        const API_URL = 'http://192.168.18.210:3000/notifikasi';
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        fetch(API_URL, { signal: controller.signal })
+            .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+            })
+            .then(data => setNotifikasiList(data))
+            .catch(err => console.error("Gagal mengambil notifikasi:", err))
+            .finally(() => setIsLoading(false));
+
+        return () => clearTimeout(timeout);
+    }, []); // Array kosong berarti efek ini hanya dijalankan sekali setelah render pertama
+
+    // --- Komponen Pemuatan (Loading) ---
+    if (isLoading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#3B82F6" />
+                <Text style={styles.loadingText}>Memuat notifikasi...</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -40,7 +52,7 @@ export default function Notifikasi() {
                 <Text style={styles.cardTitle}>{item.title}</Text>
                 <Text style={styles.cardDate}>{item.date}</Text>
                 </View>
-                <Text style={styles.cardContent}>{item.content}</Text>
+                <Text style={styles.cardContent}>{item.pesan}</Text>
             </View>
             ))}
         </ScrollView>

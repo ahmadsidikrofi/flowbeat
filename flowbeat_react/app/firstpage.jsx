@@ -29,7 +29,7 @@ export default function FirstPage() {
 
         <TouchableOpacity
           style={styles.signupButton}
-          onPress={() => router.push('/akun')}
+          onPress={() => router.push('/loginpage')}
         >
           <Text style={styles.signupText}>BUAT AKUN</Text>
         </TouchableOpacity>

@@ -11,3 +11,6 @@ npx expo install expo@latest
 upgrade dependencie
 npx expo install --fix
 npx expo-doctor -> cek apa saja yang harus diperbaiki
+
+Koneksikan React Native ke API
+npm install axios
