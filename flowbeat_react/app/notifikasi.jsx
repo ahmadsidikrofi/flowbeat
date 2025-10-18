@@ -12,7 +12,8 @@ export default function Notifikasi() {
     // 2. Gunakan useEffect untuk mengambil data dari API
     useEffect(() => {
         // Tentukan URL API
-        const API_URL = 'http://192.168.18.210:3000/notifikasi';
+        const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/notifikasi`;
+
 
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5000);

@@ -14,3 +14,6 @@ npx expo-doctor -> cek apa saja yang harus diperbaiki
 
 Koneksikan React Native ke API
 npm install axios
+
+agar bisa akses ENV jalanin projeknya pakai ini agar terhapus cachenya
+npx expo start -c
