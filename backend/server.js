@@ -21,11 +21,6 @@ app.get('/notifikasi', (req, res) => {
     ]);
 });
 
-// Jalankan server
-// app.listen(PORT, () => {
-//     console.log(`Server berjalan di http://localhost:${PORT}`);
-// });
-
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
     console.log(`Akses jaringan: http://192.168.18.210:${PORT}`); 

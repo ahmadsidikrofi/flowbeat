@@ -22,14 +22,14 @@ export default function FirstPage() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => router.push('/home')}
+          onPress={() => router.push('/loginpage')}
         >
           <Text style={styles.loginText}>MASUK</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.signupButton}
-          onPress={() => router.push('/loginpage')}
+          onPress={() => router.push('/home')}
         >
           <Text style={styles.signupText}>BUAT AKUN</Text>
         </TouchableOpacity>
