@@ -9,13 +9,15 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Konfigurasi koneksi ke MySQL (XAMPP)
+// Konfigurasi koneksi ke MySQL (XAMPP) dengan env
+const dotenv = require('dotenv');
+dotenv.config();
 const db = mysql.createConnection({
-    host: '127.0.0.1',   // bisa juga 127.0.0.1
-    port: 7000,
-    user: 'root',        // user default XAMPP
-    password: '',        // kosong kalau default
-    database: 'flowbeat'
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
 });
 
 // Coba koneksi

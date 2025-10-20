@@ -78,3 +78,7 @@ const Chance = require('chance');
 const chance = new Chance();
 
 running knexjs: npx knex seed:run
+
+.env file untuk keamanan
+npm install dotenv
+Buat file .env
