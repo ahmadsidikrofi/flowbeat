@@ -69,4 +69,12 @@ module.exports = {
 
 table yang tidak ada foreignkey bisa dengan seeder file terpisah tapi kalau ada foreign key dijadikan 1 file seeder saja
 
+seperti factory laravel: fakerJs & chanceJs
+npm install @faker-js/faker
+const { faker } = require('@faker-js/faker');
+
+npm install chance
+const Chance = require('chance');
+const chance = new Chance();
+
 running knexjs: npx knex seed:run

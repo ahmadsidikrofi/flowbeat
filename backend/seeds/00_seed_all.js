@@ -2,6 +2,11 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> } 
  */
+
+const { faker } = require('@faker-js/faker');
+const Chance = require('chance');
+const chance = new Chance();
+
 exports.seed = async function(knex) {
   await knex.raw('SET FOREIGN_KEY_CHECKS = 0');
   await knex('detak_jantung').truncate();
@@ -28,17 +33,27 @@ exports.seed = async function(knex) {
     }
   ]);
 
-  //bpm
-  await knex('detak_jantung').insert([
-    { id: 1, lansia_id: 1, nilai: 88 },
-    { id: 2, lansia_id: 2, nilai: 102 }
-  ]);
+  //spo2 - cara ChanceJs
+  function createSpo2() {
+    return {
+      lansia_id: chance.integer({ min: 1, max: 2 }),
+      nilai: chance.integer({ min: 60, max: 100 })
+    };
+  }
 
-  //spo2
-  await knex('spo2').insert([
-    { id: 1, lansia_id: 1, nilai: 97.5 },
-    { id: 2, lansia_id: 2, nilai: 95.2 }
-  ]);
+  const spo2 = Array.from({ length: 20 }, () => createSpo2());
+  await knex('spo2').insert(spo2);
+
+
+  //detak jantung - cara FakerJs
+  const bpmLansia = Array.from({ length: 20 }).map(() => ({
+    lansia_id: faker.number.int({ min: 1, max: 2 }),
+    nilai: faker.number.int({ min: 70, max: 120 })
+  }));
+
+
+  await knex('detak_jantung').insert(bpmLansia);
+
 
   //notif
   await knex('notifikasi').insert([
