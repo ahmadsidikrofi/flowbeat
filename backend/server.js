@@ -58,6 +58,16 @@ app.get('/lansia', (req, res) => {
     });
 });
 
+// READ - Lansia by ID
+app.get('/lansia/:id', (req, res) => {
+    const sql = 'SELECT * FROM lansia WHERE id = ?';
+    db.query(sql, [req.params.id], (err, result) => {
+        if (err) return res.status(500).json({ error: err });
+        if (result.length === 0) return res.status(404).json({ message: 'Data tidak ditemukan' });
+        res.json(result[0]);
+    });
+});
+
 // POST tambah lansia
 app.post('/lansia', (req, res) => {
     const { name, phone_number, password, address } = req.body;
@@ -85,11 +95,38 @@ app.put('/lansia/:id', (req, res) => {
     );
 });
 // DELETE lansia
+// DELETE - Lansia (dengan peringatan & pengecekan relasi)
 app.delete('/lansia/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('DELETE FROM lansia WHERE id=?', [id], (err) => {
+    const lansiaId = req.params.id;
+
+    // Cek apakah ada data terkait di tabel lain
+    const checkRelations = `
+        SELECT 
+        (SELECT COUNT(*) FROM detak_jantung WHERE lansia_id = ?) AS detak_count,
+        (SELECT COUNT(*) FROM spo2 WHERE lansia_id = ?) AS spo2_count,
+        (SELECT COUNT(*) FROM notifikasi WHERE lansia_id = ?) AS notif_count
+    `;
+
+    db.query(checkRelations, [lansiaId, lansiaId, lansiaId], (err, results) => {
         if (err) return res.status(500).json({ error: err });
-        res.json({ message: 'Lansia dihapus' });
+
+        const { detak_count, spo2_count, notif_count } = results[0];
+        const totalRelations = detak_count + spo2_count + notif_count;
+
+        if (totalRelations > 0) {
+        return res.status(400).json({
+            message: 'Tidak dapat menghapus data lansia ini karena masih memiliki data terkait di tabel lain.',
+            detail: { detak_count, spo2_count, notif_count }
+        });
+        }
+
+        // Jika aman untuk dihapus
+        const sql = 'DELETE FROM lansia WHERE id = ?';
+        db.query(sql, [lansiaId], (err, result) => {
+        if (err) return res.status(500).json({ error: err });
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Data tidak ditemukan' });
+        res.json({ message: 'Data lansia berhasil dihapus' });
+        });
     });
 });
 
@@ -99,6 +136,19 @@ app.delete('/lansia/:id', (req, res) => {
 
 app.get('/spo2', (req, res) => {
     db.query('SELECT * FROM spo2', (err, results) => {
+        if (err) return res.status(500).json({ error: err });
+        res.json(results);
+    });
+});
+
+app.get('/spo-2', (req, res) => {
+    const sql = `
+        SELECT s.*, l.name AS nama_lansia 
+        FROM spo2 s
+        JOIN lansia l ON s.lansia_id = l.id
+        ORDER BY s.created_at DESC
+    `;
+    db.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: err });
         res.json(results);
     });
@@ -127,6 +177,20 @@ app.get('/detak-jantung', (req, res) => {
     });
 });
 
+// GET semua detak_jantung
+app.get('/detak_jantung', (req, res) => {
+    const sql = `
+        SELECT dj.*, l.name AS nama_lansia 
+        FROM detak_jantung dj
+        JOIN lansia l ON dj.lansia_id = l.id
+        ORDER BY dj.created_at DESC
+    `;
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: err });
+        res.json(results);
+    });
+});
+
 app.post('/detak-jantung', (req, res) => {
     const { lansia_id, nilai } = req.body;
     db.query(
@@ -145,6 +209,19 @@ app.post('/detak-jantung', (req, res) => {
 
 app.get('/notifikasi', (req, res) => {
     db.query('SELECT * FROM notifikasi', (err, results) => {
+        if (err) return res.status(500).json({ error: err });
+        res.json(results);
+    });
+});
+
+app.get('/notif', (req, res) => {
+    const sql = `
+        SELECT n.*, l.name AS nama_lansia 
+        FROM notifikasi n
+        JOIN lansia l ON n.lansia_id = l.id
+        ORDER BY n.created_at DESC
+    `;
+    db.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: err });
         res.json(results);
     });
