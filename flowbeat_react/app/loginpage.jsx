@@ -90,7 +90,7 @@ export default function LoginScreen() {
                 
                 {/* Tombol Buat Akun */}
                 {/* <TouchableOpacity style={styles.registerButton} onPress={() => console.log('Buat Akun ditekan')}> */}
-                <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/firstpage')}>
+                <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/registpage')}>
                     <Text style={styles.registerButtonText}>BUAT AKUN</Text>
                 </TouchableOpacity>
 
@@ -107,11 +107,11 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         paddingHorizontal: 30,
-        paddingTop: 80, // Ruang atas
+        paddingTop: 20, // Ruang atas
         alignItems: 'center',
     },
     logo: {
-        fontSize: 36,
+        fontSize: 32,
         fontWeight: '900',
         color: '#111827',
         marginBottom: 50,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     loginButton: {
-        backgroundColor: '#5A7DFE', // Biru muda
+        backgroundColor: '#3B82F6', // Biru muda
         borderRadius: 10,
         width: '100%',
         paddingVertical: 15,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     forgotPassword: {
-        color: '#5A7DFE',
+        color: '#3B82F6',
         fontSize: 14,
         fontWeight: '500',
         marginBottom: 40,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     registerButton: {
-        borderColor: '#5A7DFE',
+        borderColor: '#3B82F6',
         borderWidth: 2,
         borderRadius: 10,
         width: '100%',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     registerButtonText: {
-        color: '#5A7DFE',
+        color: '#3B82F6',
         fontSize: 18,
         fontWeight: 'bold',
     },

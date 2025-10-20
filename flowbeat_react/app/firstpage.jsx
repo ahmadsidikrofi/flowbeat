@@ -29,7 +29,7 @@ export default function FirstPage() {
 
         <TouchableOpacity
           style={styles.signupButton}
-          onPress={() => router.push('/home')}
+          onPress={() => router.push('/registpage')}
         >
           <Text style={styles.signupText}>BUAT AKUN</Text>
         </TouchableOpacity>
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#f9f9f9',
     borderWidth: 2,
-    borderColor: '#5A7DFE',
+    borderColor: '#3B82F6',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
@@ -74,11 +74,11 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#5A7DFE',
+    color: '#3B82F6',
   },
   signupButton: {
     width: '100%',
-    backgroundColor: '#5A7DFE',
+    backgroundColor: '#3B82F6',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
