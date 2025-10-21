@@ -4,7 +4,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -250,7 +249,11 @@ app.delete('/notifikasi/:id', (req, res) => {
 
 
 
-app.listen(PORT, '0.0.0.0', () => {
+const HOST = process.env.HOST;
+const PORT = process.env.PORT;
+const IP_PUBLIC = process.env.IP_PUBLIC;
+
+app.listen(PORT, HOST, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
-    console.log(`Akses jaringan: http://192.168.18.210:${PORT}`); 
+    console.log(`Akses jaringan: http://${IP_PUBLIC}:${PORT}`);
 });
