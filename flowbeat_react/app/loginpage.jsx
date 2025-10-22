@@ -4,29 +4,29 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { login } from '../services/api/login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
     const router = useRouter();
-    const [phone, setPhone] = useState('');
+    const [phone_number, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async () => {
-        if (!phone || !password) {
+        if (!phone_number.trim() || !password.trim()) {
             Alert.alert('Gagal Masuk', 'Nomor handphone dan kata sandi wajib diisi.');
             return;
         }
         
         try {
-            // Perlu diperhatikan: Di dunia nyata, Anda akan menggunakan API Laravel/XAMPP
-            // Di sini kita pakai mock API Node.js untuk testing
-            const data = await login(phone, password);
-            
-            // Simpan token atau informasi user dan navigasi ke halaman utama
-            Alert.alert('Berhasil Login', `Selamat datang kembali!`);
-            router.replace('/home'); // Ganti dengan rute home Anda
+            const data = await login(phone_number, password);
+            // console.log('Response login:', data);
+            await AsyncStorage.setItem('token', data.token);
+            await AsyncStorage.setItem('user', JSON.stringify(data.lansia));
+
+            Alert.alert('Berhasil Login', `Selamat datang, ${data.lansia.name}!`);
+            router.replace('/home');
         } catch (err) {
-            // Asumsikan server Node.js memberikan status error 401 atau 403 untuk kredensial salah
             Alert.alert('Gagal', 'Nomor Handphone atau Kata Sandi salah.');
         }
     };
@@ -45,8 +45,9 @@ export default function LoginScreen() {
                         placeholderTextColor="#B0B0B0"
                         keyboardType="phone-pad"
                         onChangeText={setPhone}
-                        value={phone}
+                        value={phone_number}
                         maxLength={15}
+                        autoCapitalize="none"
                     />
                 </View>
 
@@ -59,6 +60,7 @@ export default function LoginScreen() {
                         secureTextEntry={!showPassword}
                         onChangeText={setPassword}
                         value={password}
+                        autoCapitalize="none"
                     />
                     <TouchableOpacity 
                         style={styles.eyeIcon} 
@@ -73,13 +75,13 @@ export default function LoginScreen() {
                 </View>
                 
                 {/* Tombol Masuk */}
-                {/* <TouchableOpacity style={styles.loginButton} onPress={handleLogin}> */}
-                <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/home')}>
+                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                     <Text style={styles.loginButtonText}>MASUK</Text>
                 </TouchableOpacity>
 
                 {/* Lupa Password */}
-                <TouchableOpacity onPress={() => console.log('Lupa password ditekan')}>
+                {/* <TouchableOpacity onPress={() => console.log('Lupa password ditekan')}> */}
+                <TouchableOpacity onPress={() => router.push('/home')}>
                     <Text style={styles.forgotPassword}>Lupa password?</Text>
                 </TouchableOpacity>
 
@@ -89,7 +91,6 @@ export default function LoginScreen() {
                 <Text style={styles.noAccountText}>Belum mempunyai akun?</Text>
                 
                 {/* Tombol Buat Akun */}
-                {/* <TouchableOpacity style={styles.registerButton} onPress={() => console.log('Buat Akun ditekan')}> */}
                 <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/registpage')}>
                     <Text style={styles.registerButtonText}>BUAT AKUN</Text>
                 </TouchableOpacity>

@@ -1,16 +1,26 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+
+// Konfigurasi koneksi ke MySQL dengan env
+const dotenv = require('dotenv');
+dotenv.config();
+
 const bodyParser = require('body-parser');
-
 const app = express();
-
 app.use(cors());
 app.use(bodyParser.json());
 
-// Konfigurasi koneksi ke MySQL (XAMPP) dengan env
-const dotenv = require('dotenv');
-dotenv.config();
+const bcrypt = require('bcryptjs'); //untuk autentikasi
+const jwt = require('jsonwebtoken'); //untuk autentikasi
+
+//port dengan env (tidak hardcode)
+const HOST = process.env.HOST;
+const PORT = process.env.PORT;
+const IP_PUBLIC = process.env.IP_PUBLIC;
+
+
+//KONEKSI DATABASE
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -19,7 +29,7 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-// Coba koneksi
+// CEK KONEKSI DB
 db.connect(err => {
     if (err) {
         console.error('Gagal konek ke MySQL:', err);
@@ -28,93 +38,144 @@ db.connect(err => {
     console.log('✅ Terhubung ke MySQL (XAMPP)');
 });
 
-const bcrypt = require('bcryptjs'); //untuk autentikasi
-const jwt = require('jsonwebtoken');
 
 const verifyToken = require('./middleware/auth'); //menggunakan middleware
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // =====================
-// ROUTES
+// Test ROUTES
 // =====================
-
-// Test route
 app.get('/', (req, res) => {
     res.send('Server Node.js + XAMPP aktif!');
 });
 
 // =====================
-// AUTENTIKASI: REGISTER
+// AUTENTIKASI dgn React Native
 // =====================
-app.post('/register', async (req, res) => {
-    try {
-        const { name, phone_number, password, address } = req.body;
-        if (!name || !phone_number || !password || !address) {
-            return res.status(400).json({ message: 'Semua kolom wajib diisi.' });
-        }
 
-        // Cek apakah nomor hp sudah terdaftar
-        db.query('SELECT * FROM lansia WHERE phone_number = ?', [phone_number], async (err, results) => {
-            if (err) return res.status(500).json({ error: err });
-            if (results.length > 0) {
-                return res.status(400).json({ message: 'Nomor handphone sudah terdaftar.' });
-            }
-
-            // Hash password
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            // Simpan ke database
-            db.query(
-                'INSERT INTO lansia (name, phone_number, password, address) VALUES (?, ?, ?, ?)',
-                [name, phone_number, hashedPassword, address],
-                (err, result) => {
-                    if (err) return res.status(500).json({ error: err });
-                    res.json({ message: 'Registrasi berhasil.', id: result.insertId });
-                }
-            );
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Terjadi kesalahan server', error });
-    }
+// REGISTER
+app.post('/api/register', async (req, res) => {
+    const { name, phone_number, password, address } = req.body;
+    const hashed = await bcrypt.hash(password, 10);
+    const sql = 'INSERT INTO lansia (name, phone_number, password, address) VALUES (?, ?, ?, ?)';
+    db.query(sql, [name, phone_number, hashed, address], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Akun berhasil dibuat', id: result.insertId });
+    });
 });
 
-// =====================
-// AUTENTIKASI: LOGIN
-// =====================
-app.post('/login', (req, res) => {
-    const { phone_number, password } = req.body;
+// LOGIN
+app.post('/api/login', (req, res) => {
+    // console.log('Body login diterima:', req.body);
+
+    // Terima keduanya: phone atau phone_number
+    const phone_number = req.body.phone_number || req.body.phone;
+    const { password } = req.body;
 
     if (!phone_number || !password) {
         return res.status(400).json({ message: 'Nomor handphone dan password wajib diisi.' });
     }
 
     db.query('SELECT * FROM lansia WHERE phone_number = ?', [phone_number], async (err, results) => {
-        if (err) return res.status(500).json({ error: err });
-        if (results.length === 0) return res.status(401).json({ message: 'Nomor handphone tidak ditemukan.' });
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) return res.status(401).json({ message: 'User tidak ditemukan' });
 
         const user = results[0];
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        try {
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) return res.status(401).json({ message: 'Password salah' });
 
-        if (!isPasswordValid) return res.status(401).json({ message: 'Password salah.' });
-
-        // Buat token JWT
-        const token = jwt.sign(
-            { id: user.id, phone_number: user.phone_number },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES }
-        );
-
-        res.json({
-            message: 'Login berhasil',
-            token,
-            user: {
-                id: user.id,
-                name: user.name,
-                phone_number: user.phone_number,
-                address: user.address
-            }
-        });
+            const token = jwt.sign({ id: user.id, name: user.name }, JWT_SECRET, { expiresIn: '2h' });
+            return res.json({
+                message: 'Login berhasil',
+                token,
+                lansia: {
+                    id: user.id,
+                    name: user.name,
+                    phone_number: user.phone_number,
+                    address: user.address
+                }
+            });
+        } catch (e) {
+            console.error('Error bcrypt.compare:', e);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat verifikasi password' });
+        }
     });
 });
+
+// =====================
+// AUTENTIKASI: REGISTER POSTMAN
+// =====================
+// app.post('/register', async (req, res) => {
+//     try {
+//         const { name, phone_number, password, address } = req.body;
+//         if (!name || !phone_number || !password || !address) {
+//             return res.status(400).json({ message: 'Semua kolom wajib diisi.' });
+//         }
+
+//         // Cek apakah nomor hp sudah terdaftar
+//         db.query('SELECT * FROM lansia WHERE phone_number = ?', [phone_number], async (err, results) => {
+//             if (err) return res.status(500).json({ error: err });
+//             if (results.length > 0) {
+//                 return res.status(400).json({ message: 'Nomor handphone sudah terdaftar.' });
+//             }
+
+//             // Hash password
+//             const hashedPassword = await bcrypt.hash(password, 10);
+
+//             // Simpan ke database
+//             db.query(
+//                 'INSERT INTO lansia (name, phone_number, password, address) VALUES (?, ?, ?, ?)',
+//                 [name, phone_number, hashedPassword, address],
+//                 (err, result) => {
+//                     if (err) return res.status(500).json({ error: err });
+//                     res.json({ message: 'Registrasi berhasil.', id: result.insertId });
+//                 }
+//             );
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Terjadi kesalahan server', error });
+//     }
+// });
+
+// =====================
+// AUTENTIKASI: LOGIN
+// =====================
+// app.post('/login', (req, res) => {
+//     const { phone_number, password } = req.body;
+
+//     if (!phone_number || !password) {
+//         return res.status(400).json({ message: 'Nomor handphone dan password wajib diisi.' });
+//     }
+
+//     db.query('SELECT * FROM lansia WHERE phone_number = ?', [phone_number], async (err, results) => {
+//         if (err) return res.status(500).json({ error: err });
+//         if (results.length === 0) return res.status(401).json({ message: 'Nomor handphone tidak ditemukan.' });
+
+//         const user = results[0];
+//         const isPasswordValid = await bcrypt.compare(password, user.password);
+
+//         if (!isPasswordValid) return res.status(401).json({ message: 'Password salah.' });
+
+//         // Buat token JWT
+//         const token = jwt.sign(
+//             { id: user.id, phone_number: user.phone_number },
+//             process.env.JWT_SECRET,
+//             { expiresIn: process.env.JWT_EXPIRES }
+//         );
+
+//         res.json({
+//             message: 'Login berhasil',
+//             token,
+//             user: {
+//                 id: user.id,
+//                 name: user.name,
+//                 phone_number: user.phone_number,
+//                 address: user.address
+//             }
+//         });
+//     });
+// });
 
 
 
@@ -141,17 +202,7 @@ app.get('/lansia/:id', verifyToken, (req, res) => {
 });
 
 // POST tambah lansia
-app.post('/lansia', (req, res) => {
-    const { name, phone_number, password, address } = req.body;
-    db.query(
-        'INSERT INTO lansia (name, phone_number, password, address) VALUES (?, ?, ?, ?)',
-        [name, phone_number, password, address],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: err });
-            res.json({ message: 'Lansia ditambahkan', id: result.insertId });
-        }
-    );
-});
+//sudah digantikan dengan /regist
 
 // PUT update lansia
 app.put('/lansia/:id', (req, res) => {
@@ -319,12 +370,6 @@ app.delete('/notifikasi/:id', (req, res) => {
     });
 });
 
-
-
-
-const HOST = process.env.HOST;
-const PORT = process.env.PORT;
-const IP_PUBLIC = process.env.IP_PUBLIC;
 
 app.listen(PORT, HOST, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);

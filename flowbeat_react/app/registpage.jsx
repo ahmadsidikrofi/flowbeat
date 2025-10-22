@@ -3,6 +3,7 @@ import { View, TextInput, Text, TouchableOpacity, StyleSheet, ScrollView, Alert 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router'; // Asumsi Anda menggunakan Expo Router
+import { register } from '../services/api/register';
 
 const PRIMARY_COLOR = '#3B82F6'; // Warna biru utama
 
@@ -20,24 +21,25 @@ export default function RegistPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const handleRegister = () => {
-        // Validasi Sederhana
+    const handleRegister = async () => {
         if (!fullName || !phone || !password || !confirmPassword || !address) {
             Alert.alert('Gagal Daftar', 'Semua kolom wajib diisi.');
             return;
         }
 
         if (password !== confirmPassword) {
-            Alert.alert('Gagal Daftar', 'Kata Sandi dan Konfirmasi Kata Sandi tidak sama.');
+            Alert.alert('Gagal Daftar', 'Kata sandi dan konfirmasi tidak sama.');
             return;
         }
 
-        // Di sini Anda akan menambahkan logika fetch/axios ke server Node.js Anda
-        console.log('Data Registrasi:', { fullName, phone, password, address });
-        
-        Alert.alert('Berhasil', 'Akun berhasil dibuat! Silakan masuk.');
-        // router.replace('/login'); // Ganti dengan rute login Anda
-    };
+        try {
+            const res = await register(fullName, phone, password, address);
+            Alert.alert('Berhasil', res.message || 'Akun berhasil dibuat!');
+            router.replace('/loginpage');
+        } catch (err) {
+            Alert.alert('Gagal', 'Terjadi kesalahan saat mendaftar.');
+    }};
+
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -127,8 +129,8 @@ export default function RegistPage() {
                 </View>
                 
                 {/* Tombol Daftar */}
-                {/* <TouchableOpacity style={styles.registerButton} onPress={handleRegister}> */}
-                <TouchableOpacity style={styles.registerButton} onPress={()=>router.push('/home')}>
+                <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+                {/* <TouchableOpacity style={styles.registerButton} onPress={()=>router.push('/home')}> */}
                     <Text style={styles.registerButtonText}>DAFTAR</Text>
                 </TouchableOpacity>
 

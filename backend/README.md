@@ -87,6 +87,9 @@ library autentikasi
 npm install jsonwebtoken bcryptjs
 
 Buat file baru middleware/auth.js untuk autentikasi
+tambah ini ke env
+JWT_SECRET=flowbeat_secret_key_123
+JWT_EXPIRES=1d
 
 masukkan ke raw (json) ke Postman
 {
