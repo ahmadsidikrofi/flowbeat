@@ -82,3 +82,21 @@ running knexjs: npx knex seed:run
 .env file untuk keamanan
 npm install dotenv
 Buat file .env
+
+library autentikasi
+npm install jsonwebtoken bcryptjs
+
+Buat file baru middleware/auth.js untuk autentikasi
+
+masukkan ke raw (json) ke Postman
+{
+    "name": "Budi Dibu",
+    "phone_number": "08123456789",
+    "password": "12345",
+    "address": "Jl. Melati No. 5"
+}
+
+untuk mendapatkan token, login di postman, copy token yang muncul dari dari response
+contoh token (harus dicopy semua)= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicGhvbmVfbnVtYmVyIjoiMDgxMjM0NTY3ODkiLCJpYXQiOjE3NjEwOTUxNjcsImV4cCI6MTc2MTE4MTU2N30.U6FMeXj423Jgvu6Em27_6pRAenIrMWx4Cot1aUbkq8s
+
+pastekan pada endpoint yang dilindungi ke Tap Authorization->Auth type (Bearer Token)
