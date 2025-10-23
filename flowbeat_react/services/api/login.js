@@ -1,8 +1,13 @@
 // services/api/login.js
+
+import { EXPO_PUBLIC_API_URL } from '@env';
+const API_URL = EXPO_PUBLIC_API_URL;
+
+
 export const login = async (phone_number, password) => {
     try {
         // console.log('Mengirim request login:', { phone_number, password });
-        const res = await fetch('http://192.168.1.9:3000/api/login', {
+        const res = await fetch(`${API_URL}/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone_number: phone_number, password })
@@ -21,7 +26,7 @@ export const login = async (phone_number, password) => {
 
         return data;
     } catch (err) {
-        console.error('Error login:', err);
+        // console.error('Error login:', err);
         throw err;
     }
 };

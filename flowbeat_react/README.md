@@ -18,5 +18,7 @@ npm install axios
 agar bisa akses ENV jalanin projeknya pakai ini agar terhapus cachenya
 npx expo start -c
 
+pastikan koneksi laptop dan hp sama
+
 tambahkan untuk autentikasi
 npx expo install @react-native-async-storage/async-storage

@@ -1,7 +1,10 @@
 // services/api/register.js
+import { EXPO_PUBLIC_API_URL } from '@env';
+const API_URL = EXPO_PUBLIC_API_URL;
+
 export const register = async (name, phone_number, password, address) => {
     try {
-        const res = await fetch('http://192.168.1.9:3000/api/register', {
+        const res = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, phone_number, password, address }),

@@ -28,7 +28,7 @@ export default function Akun() {
               <Text style={styles.buttonText}>PERBARUI AKUN</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('/')}>
+          <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('/firstpage')}>
               <Text style={styles.buttonText}>KELUAR AKUN</Text>
           </TouchableOpacity>
 
