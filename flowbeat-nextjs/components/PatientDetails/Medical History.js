@@ -15,21 +15,33 @@ import TableSkeleton from "../Skeleton/TableSkeleton"
 const MedicalHistory = ({ patientHealthData, bloodPressureData, VitalSignData, currentPage, setCurrentPage, totalPages, isDataMounted }) => {
   const [ isTableMounted, setIsTableMounted ] = useState(true)
   setTimeout(() => setIsTableMounted(false), 3000)
+
+  const [deviceHidden, setDeviceHidden] = useState(true)
+  const [selectedDevice, setSelectedDevice] = useState("") // Track selected device
+
   return (
     <div className="space-y-4 flex-1">
-      <ControlDelayDropdown />
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Grafik Tekanan Darah</CardTitle>
-        </CardHeader>
-        <BloodPressureChart isDataMounted={isDataMounted} bloodPressureData={bloodPressureData}/>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Grafik Tanda Vital (coming soon)</CardTitle>
-        </CardHeader>
-        <VitalSignChart isDataMounted={isDataMounted} VitalSignData={VitalSignData}/>
-      </Card>
+      <ControlDelayDropdown onSelect={setSelectedDevice} />
+
+      {/* Show Blood Pressure Chart only if Omron is selected */}
+      {selectedDevice === "omron" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Grafik Tekanan Darah (Omron Hem_7142t)</CardTitle>
+          </CardHeader>
+          <BloodPressureChart isDataMounted={isDataMounted} bloodPressureData={bloodPressureData}/>
+        </Card>
+      )}
+
+      {/* Show Vital Sign Chart only if Max30100 is selected */}
+      {selectedDevice === "max30100" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Grafik Tanda Vital (Sensor IoT Max30100)</CardTitle>
+          </CardHeader>
+          <VitalSignChart isDataMounted={isDataMounted} VitalSignData={VitalSignData}/>
+        </Card>
+      )}
       <Card>
         <CardHeader>
           <div className="flex gap-2 items-center">
@@ -48,14 +60,20 @@ const MedicalHistory = ({ patientHealthData, bloodPressureData, VitalSignData, c
                   <TableHead className="whitespace-nowrap hidden md:table-cell">SpO2</TableHead>
                   <TableHead className="whitespace-nowrap hidden md:table-cell">Pergerakan</TableHead>
                   <TableHead className="whitespace-wrap hidden lg:table-cell">{`Denyut Tidak\nTeratur`}</TableHead>
-                  <TableHead className="whitespace-nowrap">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {patientHealthData.data?.map((healthData, index) => (
+                {bloodPressureData?.map((healthData, index) => (
                   <TableRow key={index}>
-                    <TableCell data-label="Tanggal">{healthData.created_at}</TableCell>
-                    <TableCell data-label="SYS / DIA">{healthData.sys} / {healthData.dia}</TableCell>
+                    {/* <TableCell data-label="Tanggal">{healthData.date}</TableCell> */}
+                    <TableCell data-label="Tanggal">
+                      {new Date(healthData.date).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                      })}
+                    </TableCell>
+                    <TableCell data-label="SYS / DIA">{healthData.systolic} / {healthData.diastolic}</TableCell>
                     <TableCell data-label="Denyut">{healthData.bpm}</TableCell>
                     <TableCell data-label="SpO2" className="hidden md:table-cell">96</TableCell>
                     <TableCell data-label="Pergerakan" className="hidden md:table-cell cursor-cell">

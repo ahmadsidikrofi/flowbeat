@@ -85,6 +85,22 @@ export function BloodPressureChart({ bloodPressureData ,isDataMounted }) {
                   fontSize={12}
                 />
               </Line>
+              <Line
+                dataKey="bpm"
+                type="monotone"
+                stroke="#d406bfff"
+                strokeWidth={2}
+                activeDot={{
+                  r: 6,
+                }}
+              >
+                <LabelList
+                  position="top"
+                  offset={12}
+                  className="fill-foreground"
+                  fontSize={12}
+                />
+              </Line>
             </LineChart>
           </ChartContainer>
         </CardContent>

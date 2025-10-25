@@ -52,7 +52,7 @@ export default function VitalSignChart({ VitalSignData, isDataMounted }) {
                             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
                             <Brush dataKey="date" height={30} stroke="#8884d8" startIndex={startIndex} endIndex={endIndex} />
                             <Line
-                                dataKey="bpm"
+                                dataKey="hr"
                                 type="natural"
                                 stroke="#ef4444"
                                 strokeWidth={2}
@@ -71,7 +71,7 @@ export default function VitalSignChart({ VitalSignData, isDataMounted }) {
                                 />
                             </Line>
                             <Line
-                                dataKey="spo2"
+                                dataKey="SpO2"
                                 type="natural"
                                 stroke="#3b82f6"
                                 strokeWidth={2}
