@@ -2,7 +2,8 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { Stack, useRouter } from 'expo-router'; 
+import { useRouter } from 'expo-router'; 
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const Header = ({ router }) => ( // Terima 'router' sebagai prop
     <TouchableOpacity onPress={() => router.push('/akun')}>
@@ -52,49 +53,52 @@ const EmergencyCallCard = () => (
 export default function Home() {
     const router = useRouter(); // Dapatkan hook useRouter di sini
     return (
-        <SafeAreaView style={styles.container}>
-            {/* Teruskan 'router' sebagai prop */}
-            <Header router={router} /> 
-            <View style={styles.mainContent}>
-                <HealthCard
-                icon={<Ionicons name="heart-outline" size={32} color="#555" />}
-                title="Detak Jantung"
-                value="77"
-                unit="BPM"
-                status="Normal"
-                color="#e0eaff"
-                />
-                <HealthCard
-                icon={<FontAwesome5 name="wind" size={28} color="#555" />}
-                title="Oksigen Tubuh"
-                value="98"
-                unit="%"
-                status="Normal"
-                color="#e0eaff"
-                />
-                <EmergencyCallCard />
-                
+        <ProtectedRoute>
+            <SafeAreaView style={styles.container}>
+                {/* Teruskan 'router' sebagai prop */}
+                <Header router={router} /> 
+                <View style={styles.mainContent}>
+                    <HealthCard
+                    icon={<Ionicons name="heart-outline" size={32} color="#555" />}
+                    title="Detak Jantung"
+                    value="77"
+                    unit="BPM"
+                    status="Normal"
+                    color="#e0eaff"
+                    />
+                    <HealthCard
+                    icon={<FontAwesome5 name="wind" size={28} color="#555" />}
+                    title="Oksigen Tubuh"
+                    value="98"
+                    unit="%"
+                    status="Normal"
+                    color="#e0eaff"
+                    />
+                    <EmergencyCallCard />
+                    
 
-                {/* NAVIGASI BAWAH */}
-                <View style={styles.bottomNav}>
-                    <TouchableOpacity 
-                    style={styles.navButton}
-                    onPress={() => router.push('/notifikasi')} // menuju "/notifikasi"
-                    >
-                        <Icon name="notifications-outline" size={20} color="#fff" />
-                        <Text style={styles.navText}>NOTIFIKASI</Text>
-                    </TouchableOpacity>
+                    {/* NAVIGASI BAWAH */}
+                    <View style={styles.bottomNav}>
+                        <TouchableOpacity 
+                        style={styles.navButton}
+                        onPress={() => router.push('/notifikasi')} // menuju "/notifikasi"
+                        >
+                            <Icon name="notifications-outline" size={20} color="#fff" />
+                            <Text style={styles.navText}>NOTIFIKASI</Text>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity 
-                    style={styles.navButton}
-                    onPress={() => router.push('/akun')} // menuju "/akun"
-                    >
-                        <Icon name="person-outline" size={20} color="#fff" />
-                        <Text style={styles.navText}>AKUN</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity 
+                        style={styles.navButton}
+                        onPress={() => router.push('/akun')} // menuju "/akun"
+                        >
+                            <Icon name="person-outline" size={20} color="#fff" />
+                            <Text style={styles.navText}>AKUN</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
+        </ProtectedRoute>
+        
     )
 };
 

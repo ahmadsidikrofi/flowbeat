@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 export default function Notifikasi() {
     const router = useRouter();
@@ -33,41 +34,46 @@ export default function Notifikasi() {
     // --- Komponen Pemuatan (Loading) ---
     if (isLoading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#3B82F6" />
-                <Text style={styles.loadingText}>Memuat notifikasi...</Text>
-            </View>
+            <ProtectedRoute>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#3B82F6" />
+                    <Text style={styles.loadingText}>Memuat notifikasi...</Text>
+                </View>
+            </ProtectedRoute>
         );
     }
 
     return (
-        <View style={styles.container}>
-        {/* Judul Halaman */}
-        <Text style={styles.header}>NOTIFIKASI</Text>
+        <ProtectedRoute>
+            <View style={styles.container}>
+                {/* Judul Halaman */}
+                <Text style={styles.header}>NOTIFIKASI</Text>
 
-        {/* Daftar Notifikasi */}
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-            {notifikasiList.map((item) => (
-            <View key={item.id} style={styles.card}>
-                <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{item.title}</Text>
-                <Text style={styles.cardDate}>{item.date}</Text>
-                </View>
-                <Text style={styles.cardContent}>{item.pesan}</Text>
+                {/* Daftar Notifikasi */}
+                <ScrollView contentContainerStyle={styles.scrollContent}>
+                    {notifikasiList.map((item) => (
+                    <View key={item.id} style={styles.card}>
+                        <View style={styles.cardHeader}>
+                        <Text style={styles.cardTitle}>{item.title}</Text>
+                        <Text style={styles.cardDate}>{item.date}</Text>
+                        </View>
+                        <Text style={styles.cardContent}>{item.pesan}</Text>
+                    </View>
+                    ))}
+                </ScrollView>
+
+                {/* Tombol Navigasi Kembali */}
+                <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
+                    <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 5 }} />
+                    <Text style={styles.backText}>KEMBALI</Text>
+                </TouchableOpacity>
             </View>
-            ))}
-        </ScrollView>
-
-        {/* Tombol Navigasi Kembali */}
-        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
-            <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 5 }} />
-            <Text style={styles.backText}>KEMBALI</Text>
-        </TouchableOpacity>
-        </View>
+        </ProtectedRoute>
+        
     );
-    }
+}
 
-    const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,

@@ -1,44 +1,54 @@
 import { useRouter } from 'expo-router';
 import { TouchableOpacity, Text, View, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import ProtectedRoute from '../components/ProtectedRoute';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Akun() {
   const router = useRouter();
-    return (
-        <View style={styles.container}>
-          {/* Judul Halaman */}
-          <Text style={styles.title}>AKUN</Text>
 
-          {/* Foto Profil */}
-          <Image
-              // source={{ uri: "https://i.ibb.co/XFfq1zj/old-man-smile.jpg" }}
-              source={require("../assets/img/profil1.jpg")}
-              style={styles.profileImage}
-          />
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    router.replace('/firstpage');
+  };
 
-          {/* Informasi Pengguna */}
-          <Text style={styles.name}>HIDAYAT TAUFIQ</Text>
-          <Text style={styles.info}>08123456789</Text>
-          <Text style={styles.info}>
-              Jl. Soekarno, no 12, Jakarta Pusat, Kebayoran lama
-          </Text>
+  return (
+    <ProtectedRoute>
+      <View style={styles.container}>
+        {/* Judul Halaman */}
+        <Text style={styles.title}>AKUN</Text>
 
-          {/* Tombol Aksi Utama */}
-          <TouchableOpacity style={styles.updateButton}>
-              <Text style={styles.buttonText}>PERBARUI AKUN</Text>
-          </TouchableOpacity>
+        {/* Foto Profil */}
+        <Image
+            // source={{ uri: "https://i.ibb.co/XFfq1zj/old-man-smile.jpg" }}
+            source={require("../assets/img/profil1.jpg")}
+            style={styles.profileImage}
+        />
 
-          <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('/firstpage')}>
-              <Text style={styles.buttonText}>KELUAR AKUN</Text>
-          </TouchableOpacity>
+        {/* Informasi Pengguna */}
+        <Text style={styles.name}>HIDAYAT TAUFIQ</Text>
+        <Text style={styles.info}>08123456789</Text>
+        <Text style={styles.info}>
+            Jl. Soekarno, no 12, Jakarta Pusat, Kebayoran lama
+        </Text>
 
-          {/* Tombol Navigasi Kembali */}
-          <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
-            <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 5 }} />
-            <Text style={styles.backText}>KEMBALI</Text>
-          </TouchableOpacity>
-        </View>
-    );
+        {/* Tombol Aksi Utama */}
+        <TouchableOpacity style={styles.updateButton}>
+            <Text style={styles.buttonText}>PERBARUI AKUN</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.buttonText}>KELUAR AKUN</Text>
+        </TouchableOpacity>
+
+        {/* Tombol Navigasi Kembali */}
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
+          <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 5 }} />
+          <Text style={styles.backText}>KEMBALI</Text>
+        </TouchableOpacity>
+      </View>
+    </ProtectedRoute>
+  );
 }
 
 const styles = StyleSheet.create({
