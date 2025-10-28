@@ -33,7 +33,7 @@ export default function Akun() {
         </Text>
 
         {/* Tombol Aksi Utama */}
-        <TouchableOpacity style={styles.updateButton}>
+        <TouchableOpacity style={styles.updateButton} onPress={() => router.push('/editprofile')}>
             <Text style={styles.buttonText}>PERBARUI AKUN</Text>
         </TouchableOpacity>
 

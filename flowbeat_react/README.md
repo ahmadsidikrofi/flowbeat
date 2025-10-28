@@ -22,3 +22,6 @@ pastikan koneksi laptop dan hp sama
 
 tambahkan untuk autentikasi
 npx expo install @react-native-async-storage/async-storage
+
+buat upload image
+npx expo install expo-image-picker
