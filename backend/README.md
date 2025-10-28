@@ -19,6 +19,7 @@ CREATE TABLE lansia (
   phone_number VARCHAR(20),
   password VARCHAR(255),
   address TEXT,
+  photo VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE spo2 (
@@ -35,11 +36,20 @@ CREATE TABLE detak_jantung (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (lansia_id) REFERENCES lansia(id)
 );
+CREATE TABLE notifikasi (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  lansia_id INT(11) NOT NULL,
+  title VARCHAR(255) DEFAULT NULL,
+  deskripsi TEXT DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (lansia_id) REFERENCES lansia(id)
+);
 
 Manual seeder jalankan dengan : node seeder.js
 
 Library Seeder KnexJs
-nstall Knex:
+install Knex:
 npm install knex mysql2
 npx knex init
 

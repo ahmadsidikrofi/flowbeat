@@ -22,6 +22,7 @@ exports.seed = async function(knex) {
       name: 'Santoso Budi',
       phone_number: '081234567890',
       password: 'hashedpass1',
+      photo: 'default-avatar-profile.jpg',
       address: 'Jl. Merdeka No.1'
     },
     {
@@ -29,6 +30,7 @@ exports.seed = async function(knex) {
       name: 'Aminah Amira',
       phone_number: '082345678901',
       password: 'hashedpass2',
+      photo: 'default-avatar-profile.jpg',
       address: 'Jl. Mawar No.2'
     }
   ]);
