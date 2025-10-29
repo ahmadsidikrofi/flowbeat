@@ -33,7 +33,7 @@ export default function RegistPage() {
         }
 
         try {
-            const res = await register(fullName, phone, password, address);
+            const res = await register(fullName, phone, password, address, 'default-avatar-profile.jpg');
             Alert.alert('Berhasil', res.message || 'Akun berhasil dibuat!');
             router.replace('/loginpage');
         } catch (err) {

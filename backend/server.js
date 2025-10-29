@@ -57,8 +57,13 @@ app.get('/', (req, res) => {
 app.post('/api/register', async (req, res) => {
     const { name, phone_number, password, address } = req.body;
     const hashed = await bcrypt.hash(password, 10);
-    const sql = 'INSERT INTO lansia (name, phone_number, password, address) VALUES (?, ?, ?, ?)';
-    db.query(sql, [name, phone_number, hashed, address], (err, result) => {
+    const defaultPhoto = 'default-avatar-profile.jpg';
+
+    const sql = `
+        INSERT INTO lansia (name, phone_number, password, address, photo)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(sql, [name, phone_number, hashed, address, defaultPhoto], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: 'Akun berhasil dibuat', id: result.insertId });
     });

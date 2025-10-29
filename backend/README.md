@@ -46,6 +46,9 @@ CREATE TABLE notifikasi (
   FOREIGN KEY (lansia_id) REFERENCES lansia(id)
 );
 
+ALTER TABLE lansia 
+MODIFY photo VARCHAR(255) DEFAULT 'default-avatar-profile.jpg';
+
 Manual seeder jalankan dengan : node seeder.js
 
 Library Seeder KnexJs
