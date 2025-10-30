@@ -109,79 +109,22 @@ app.post('/api/login', (req, res) => {
 });
 
 // =====================
-// AUTENTIKASI: REGISTER POSTMAN
+// GET /api/home
 // =====================
-// app.post('/register', async (req, res) => {
-//     try {
-//         const { name, phone_number, password, address } = req.body;
-//         if (!name || !phone_number || !password || !address) {
-//             return res.status(400).json({ message: 'Semua kolom wajib diisi.' });
-//         }
-
-//         // Cek apakah nomor hp sudah terdaftar
-//         db.query('SELECT * FROM lansia WHERE phone_number = ?', [phone_number], async (err, results) => {
-//             if (err) return res.status(500).json({ error: err });
-//             if (results.length > 0) {
-//                 return res.status(400).json({ message: 'Nomor handphone sudah terdaftar.' });
-//             }
-
-//             // Hash password
-//             const hashedPassword = await bcrypt.hash(password, 10);
-
-//             // Simpan ke database
-//             db.query(
-//                 'INSERT INTO lansia (name, phone_number, password, address) VALUES (?, ?, ?, ?)',
-//                 [name, phone_number, hashedPassword, address],
-//                 (err, result) => {
-//                     if (err) return res.status(500).json({ error: err });
-//                     res.json({ message: 'Registrasi berhasil.', id: result.insertId });
-//                 }
-//             );
-//         });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Terjadi kesalahan server', error });
-//     }
-// });
-
-// =====================
-// AUTENTIKASI: LOGIN
-// =====================
-// app.post('/login', (req, res) => {
-//     const { phone_number, password } = req.body;
-
-//     if (!phone_number || !password) {
-//         return res.status(400).json({ message: 'Nomor handphone dan password wajib diisi.' });
-//     }
-
-//     db.query('SELECT * FROM lansia WHERE phone_number = ?', [phone_number], async (err, results) => {
-//         if (err) return res.status(500).json({ error: err });
-//         if (results.length === 0) return res.status(401).json({ message: 'Nomor handphone tidak ditemukan.' });
-
-//         const user = results[0];
-//         const isPasswordValid = await bcrypt.compare(password, user.password);
-
-//         if (!isPasswordValid) return res.status(401).json({ message: 'Password salah.' });
-
-//         // Buat token JWT
-//         const token = jwt.sign(
-//             { id: user.id, phone_number: user.phone_number },
-//             process.env.JWT_SECRET,
-//             { expiresIn: process.env.JWT_EXPIRES }
-//         );
-
-//         res.json({
-//             message: 'Login berhasil',
-//             token,
-//             user: {
-//                 id: user.id,
-//                 name: user.name,
-//                 phone_number: user.phone_number,
-//                 address: user.address
-//             }
-//         });
-//     });
-// });
-
+app.get('/api/home', verifyToken, (req, res) => {
+    const userId = req.user.id;
+    const sql = `
+        SELECT 
+            l.name, 
+            l.photo,
+            (SELECT nilai FROM detak_jantung WHERE lansia_id = l.id ORDER BY created_at DESC LIMIT 1) AS bpm,
+            (SELECT nilai FROM spo2 WHERE lansia_id = l.id ORDER BY created_at DESC LIMIT 1) AS spo2
+        FROM lansia l WHERE l.id = ?`;
+    db.query(sql, [userId], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(result[0]);
+    });
+});
 
 
 // ---------------------

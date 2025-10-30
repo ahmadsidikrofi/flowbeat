@@ -1,96 +1,141 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router'; 
 import ProtectedRoute from '../components/ProtectedRoute';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { EXPO_PUBLIC_API_URL } from '@env';
 
-const Header = ({ router }) => ( // Terima 'router' sebagai prop
-    <TouchableOpacity onPress={() => router.push('/akun')}>
-        <View style={styles.headerContainer}>
-        <Image
-            // source={{ uri: 'https://i.pravatar.cc/150?img=68' }}
-            source={require("../assets/img/profil1.jpg")}
-            style={styles.profileImage}
-        />
-        <Text style={styles.headerText}>Halo, Hidayat Taufiq</Text>
-        </View>
-    </TouchableOpacity>
-);
-
-const HealthCard = ({ icon, title, value, unit, status, color }) => (
-    <TouchableOpacity style={[styles.healthCard, { backgroundColor: color }]}>
-        <View style={styles.cardContent}>
-        <View style={styles.cardInfo}>
-            {icon}
-            <Text style={styles.cardTitle}>{title}</Text>
-            <View style={styles.valueContainer}>
-            <Text style={styles.valueText}>{value}</Text>
-            <Text style={styles.unitText}>{unit}</Text>
-            </View>
-            <View style={styles.statusLabel}>
-            <Text style={styles.statusText}>{status}</Text>
-            </View>
-        </View>
-        <Ionicons name="arrow-forward-sharp" size={24} color="#555" />
-        </View>
-    </TouchableOpacity>
-);
-
-const EmergencyCallCard = () => (
-    <TouchableOpacity onPress={() => Linking.openURL('tel:112')} style={[styles.emergencyCard]}>
-        <View style={styles.emergencyContent}>
-        <Ionicons name="call" size={36} color="#fff" style={styles.emergencyIcon} />
-        <View style={styles.emergencyInfo}>
-            <Text style={styles.emergencyNumber}>112</Text>
-            <Text style={styles.emergencyText}>Panggilan Darurat</Text>
-        </View>
-        </View>
-    </TouchableOpacity>
-);
+const API_URL = EXPO_PUBLIC_API_URL;
 
 
 export default function Home() {
     const router = useRouter(); // Dapatkan hook useRouter di sini
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) {
+                    router.replace('/loginpage');
+                    return;
+                }
+
+                const res = await fetch(`${API_URL}/api/home`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                const data = await res.json();
+                setUserData(data);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.centered}>
+                <ActivityIndicator size="large" color="#3B82F6" />
+            </SafeAreaView>
+        );
+    }
+
+    if (!userData) {
+        return (
+            <SafeAreaView style={styles.centered}>
+                <Text>Gagal memuat data pengguna</Text>
+            </SafeAreaView>
+        );
+    }
+
+    const { name, photo, bpm, spo2 } = userData;
+    const profilePhoto = photo && photo !== 'default-avatar-profile.jpg'
+    ? { uri: `${API_URL}/images/${photo}` }
+    : require('../assets/img/default-avatar-profile.jpg');
+    console.log('data:',userData)
+    console.log('Profile photo URL:', `${API_URL}/${photo}`);
+
+
     return (
         <ProtectedRoute>
             <SafeAreaView style={styles.container}>
                 {/* Teruskan 'router' sebagai prop */}
-                <Header router={router} /> 
+                
+                {/* HEADER */}
+                <TouchableOpacity onPress={() => router.push('/akun')}>
+                    <View style={styles.headerContainer}>
+                        <Image
+                            source={profilePhoto }
+                            style={styles.profileImage}
+                        />
+                        <Text style={styles.headerText}>Halo, {name}</Text>
+                    </View>
+                </TouchableOpacity>
+
+
+                {/* DATA KESEHATAN */}
                 <View style={styles.mainContent}>
-                    <HealthCard
-                    icon={<Ionicons name="heart-outline" size={32} color="#555" />}
-                    title="Detak Jantung"
-                    value="77"
-                    unit="BPM"
-                    status="Normal"
-                    color="#e0eaff"
-                    />
-                    <HealthCard
-                    icon={<FontAwesome5 name="wind" size={28} color="#555" />}
-                    title="Oksigen Tubuh"
-                    value="98"
-                    unit="%"
-                    status="Normal"
-                    color="#e0eaff"
-                    />
-                    <EmergencyCallCard />
-                    
+                    <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}>
+                        <View style={styles.cardContent}>
+                            <View style={styles.cardInfo}>
+                                <Ionicons name="heart-outline" size={32} color="#555" />
+                                <Text style={styles.cardTitle}>Detak Jantung</Text>
+                                <View style={styles.valueContainer}>
+                                    <Text style={styles.valueText}>{bpm ?? '--'}</Text>
+                                    <Text style={styles.unitText}>BPM</Text>
+                                </View>
+                                <View style={styles.statusLabel}>
+                                    <Text style={styles.statusText}>{bpm ? 'Normal' : 'Tidak Ada Data'}</Text>
+                                </View>
+                            </View>
+                            <Ionicons name="arrow-forward-sharp" size={24} color="#555" />
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}>
+                        <View style={styles.cardContent}>
+                            <View style={styles.cardInfo}>
+                                <FontAwesome5 name="wind" size={28} color="#555" />
+                                <Text style={styles.cardTitle}>Oksigen Tubuh</Text>
+                                <View style={styles.valueContainer}>
+                                    <Text style={styles.valueText}>{spo2 ?? '--'}</Text>
+                                    <Text style={styles.unitText}>%</Text>
+                                </View>
+                                <View style={styles.statusLabel}>
+                                    <Text style={styles.statusText}>{spo2 ? 'Normal' : 'Tidak Ada Data'}</Text>
+                                </View>
+                            </View>
+                            <Ionicons name="arrow-forward-sharp" size={24} color="#555" />
+                        </View>
+                    </TouchableOpacity>
+
+                    {/* PANGGILAN DARURAT */}
+                    <TouchableOpacity onPress={() => Linking.openURL('tel:112')} style={[styles.emergencyCard]}>
+                        <View style={styles.emergencyContent}>
+                            <Ionicons name="call" size={36} color="#fff" style={styles.emergencyIcon} />
+                            <View style={styles.emergencyInfo}>
+                                <Text style={styles.emergencyNumber}>112</Text>
+                                <Text style={styles.emergencyText}>Panggilan Darurat</Text>
+                            </View>
+                        </View>
+                    </TouchableOpacity>
 
                     {/* NAVIGASI BAWAH */}
                     <View style={styles.bottomNav}>
-                        <TouchableOpacity 
-                        style={styles.navButton}
-                        onPress={() => router.push('/notifikasi')} // menuju "/notifikasi"
-                        >
+                        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/notifikasi')}>
                             <Icon name="notifications-outline" size={20} color="#fff" />
                             <Text style={styles.navText}>NOTIFIKASI</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity 
-                        style={styles.navButton}
-                        onPress={() => router.push('/akun')} // menuju "/akun"
-                        >
+                        <TouchableOpacity style={styles.navButton} onPress={() => router.push('/akun')}>
                             <Icon name="person-outline" size={20} color="#fff" />
                             <Text style={styles.navText}>AKUN</Text>
                         </TouchableOpacity>

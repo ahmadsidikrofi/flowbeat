@@ -6,6 +6,7 @@
 const { faker } = require('@faker-js/faker');
 const Chance = require('chance');
 const chance = new Chance();
+const bcrypt = require('bcryptjs');
 
 exports.seed = async function(knex) {
   await knex.raw('SET FOREIGN_KEY_CHECKS = 0');
@@ -16,24 +17,28 @@ exports.seed = async function(knex) {
   await knex.raw('SET FOREIGN_KEY_CHECKS = 1');
 
   // LANSIA
+  const hashedPass1 = await bcrypt.hash('123', 10);
+  const hashedPass2 = await bcrypt.hash('321', 10);
+
   await knex('lansia').insert([
     {
       id: 1,
       name: 'Santoso Budi',
-      phone_number: '081234567890',
-      password: 'hashedpass1',
+      phone_number: '123',
+      password: hashedPass1,
       photo: 'default-avatar-profile.jpg',
       address: 'Jl. Merdeka No.1'
     },
     {
       id: 2,
       name: 'Aminah Amira',
-      phone_number: '082345678901',
-      password: 'hashedpass2',
+      phone_number: '321',
+      password: hashedPass2,
       photo: 'default-avatar-profile.jpg',
       address: 'Jl. Mawar No.2'
     }
   ]);
+
 
   //spo2 - cara ChanceJs
   function createSpo2() {
