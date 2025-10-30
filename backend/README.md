@@ -116,3 +116,23 @@ untuk mendapatkan token, login di postman, copy token yang muncul dari dari resp
 contoh token (harus dicopy semua)= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicGhvbmVfbnVtYmVyIjoiMDgxMjM0NTY3ODkiLCJpYXQiOjE3NjEwOTUxNjcsImV4cCI6MTc2MTE4MTU2N30.U6FMeXj423Jgvu6Em27_6pRAenIrMWx4Cot1aUbkq8s
 
 pastekan pada endpoint yang dilindungi ke Tap Authorization->Auth type (Bearer Token)
+
+
+ketika menambah atau mengurangi sql untuk API
+const sql = `
+        SELECT 
+            l.name, 
+            l.photo,
+            (SELECT nilai FROM detak_jantung WHERE lansia_id = l.id ORDER BY created_at DESC LIMIT 1) AS bpm,
+            (SELECT nilai FROM spo2 WHERE lansia_id = l.id ORDER BY created_at DESC LIMIT 1) AS spo2
+        FROM lansia l WHERE l.id = ?`;
+
+sesuaikan juga di frontendnya untuk destructuring
+const { name, photo, bpm, spo2 } = userData;
+Artinya:
+- photo = userData.photo
+- name = userData.name
+- dst.
+Jadi kamu tidak perlu lagi menulis userData.photo, cukup photo.
+
+

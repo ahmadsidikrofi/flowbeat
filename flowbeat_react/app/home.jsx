@@ -58,15 +58,11 @@ export default function Home() {
     }
 
     const { name, photo, bpm, spo2 } = userData;
-    // const profilePhoto = photo && photo !== 'default-avatar-profile.jpg'
-    // ? { uri: `${API_URL}/images/${photo}` }
-    // : require('../assets/img/default-avatar-profile.jpg');
-    const profilePhoto = photo 
-        ? { uri: `${API_URL}/${photo}` } 
-        : require('../assets/img/default-avatar-profile.jpg');
-
-    console.log('data:',userData)
-    console.log('Profile photo URL:', `${API_URL}/${photo}`);
+    const profilePhoto = photo && photo !== 'default-avatar-profile.jpg'
+    ? { uri: `${API_URL}/${photo}` }
+    : require('../assets/img/default-avatar-profile.jpg');
+    // console.log('data:',userData)
+    // console.log('Profile photo URL:', `${API_URL}/${photo}`);
 
 
     return (
@@ -78,7 +74,7 @@ export default function Home() {
                 <TouchableOpacity onPress={() => router.push('/akun')}>
                     <View style={styles.headerContainer}>
                         <Image
-                            source={profilePhoto }
+                            source={profilePhoto}
                             style={styles.profileImage}
                         />
                         <Text style={styles.headerText}>Halo, {name}</Text>

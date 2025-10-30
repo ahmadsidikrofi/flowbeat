@@ -112,7 +112,7 @@ app.post('/api/login', (req, res) => {
 });
 
 // =====================
-// GET /api/home
+// GET data-data home
 // =====================
 app.get('/api/home', verifyToken, (req, res) => {
     const userId = req.user.id;
@@ -141,6 +141,28 @@ app.get('/api/home', verifyToken, (req, res) => {
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+
+// =====================
+// GET Akun
+// =====================
+app.get('/api/akun', verifyToken, (req, res) => {
+    const userId = req.user.id;
+    const sql=`SELECT name, phone_number, address, photo FROM lansia WHERE id = ?`;
+    db.query(sql, [userId], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (result.length === 0) return res.status(404).json({ message: 'User not found' });
+
+        const user = result[0];
+
+        // ✅ Tambahkan path relatif (jika ada foto)
+        if (user.photo) {
+        user.photo = `images/${user.photo}`;
+        }
+
+        res.json(user);
+    });
+});
 
 // ---------------------
 // CRUD: LANSIA

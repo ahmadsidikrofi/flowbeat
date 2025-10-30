@@ -1,12 +1,67 @@
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { TouchableOpacity, Text, View, StyleSheet, Image } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ProtectedRoute from '../components/ProtectedRoute';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { EXPO_PUBLIC_API_URL } from '@env';
+
+const API_URL = EXPO_PUBLIC_API_URL;
 
 export default function Akun() {
   const router = useRouter();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) {
+                    router.replace('/loginpage');
+                    return;
+                }
+
+                const res = await fetch(`${API_URL}/api/akun`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                const data = await res.json();
+                setUserData(data);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.centered}>
+                <ActivityIndicator size="large" color="#3B82F6" />
+            </SafeAreaView>
+        );
+    }
+
+    if (!userData) {
+        return (
+            <SafeAreaView style={styles.centered}>
+                <Text>Gagal memuat data pengguna</Text>
+            </SafeAreaView>
+        );
+    }
+
+    const { name, photo, phone_number, address } = userData;
+    const profilePhoto = photo && photo !== 'default-avatar-profile.jpg'
+    ? { uri: `${API_URL}/${photo}` }
+    : require('../assets/img/default-avatar-profile.jpg');
+
+
+  //UNTUK LOGOUT
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
     router.replace('/firstpage');
@@ -21,15 +76,15 @@ export default function Akun() {
         {/* Foto Profil */}
         <Image
             // source={{ uri: "https://i.ibb.co/XFfq1zj/old-man-smile.jpg" }}
-            source={require("../assets/img/profil1.jpg")}
+            source={profilePhoto}
             style={styles.profileImage}
         />
 
         {/* Informasi Pengguna */}
-        <Text style={styles.name}>HIDAYAT TAUFIQ</Text>
-        <Text style={styles.info}>08123456789</Text>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.info}>{phone_number}</Text>
         <Text style={styles.info}>
-            Jl. Soekarno, no 12, Jakarta Pusat, Kebayoran lama
+            {address}
         </Text>
 
         {/* Tombol Aksi Utama */}
