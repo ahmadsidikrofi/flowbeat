@@ -6,15 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
 
 Route::get('/test', function (Request $request) {
     return response()->json(['message' => 'API is laravel running']);
 });
 
-Route::get('/user', [AuthController::class, 'ShowAllUsers']);
+Route::get('/users', [AuthController::class, 'ShowAllUsers']);
 Route::get('/user/{id}', [AuthController::class, 'GetPatientDetailsById']);
 // endpoint data join dari user dan omron dan max30100
 

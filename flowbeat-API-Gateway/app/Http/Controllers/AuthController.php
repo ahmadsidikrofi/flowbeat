@@ -10,13 +10,13 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('phone_number', 'password'))) {
             return response()->json([
                 'success' => false,
                 'message' => 'Kredential tidak sesuai'
             ], 401);
         }
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = User::where('phone_number', $request->phone_number)->firstOrFail();
 
         $token = $user->createToken('auth_token')->plainTextToken;
         if ($token) {

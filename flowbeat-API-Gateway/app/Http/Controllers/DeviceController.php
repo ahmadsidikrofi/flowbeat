@@ -66,21 +66,31 @@ class DeviceController extends Controller
         }
     }
 
-    public function GetOmronDataByUserId($id)
-    {
-        $userId = User::where('id', $id)->first();
-        if (!$userId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User tidak ditemukan'
-            ], 404);
-        }
+    // public function GetOmronDataByUserId($id)
+    // {
+    //     $userId = User::where('id', $id)->first();
+    //     if (!$userId) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'User tidak ditemukan'
+    //         ], 404);
+    //     }
 
-        $omronData = OmronModel::where('user_id', $userId->id)->get();
+    //     $omronData = OmronModel::where('user_id', $userId->id)->latest()->get();
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $omronData
+    //     ]);
+    // }
+
+    function GetOmronDataByUserId()
+    {
+        $omronData = OmronModel::latest()->get();
         return response()->json([
             'success' => true,
             'data' => $omronData
         ]);
+        
     }
 
     ## Menampilkan Data MAX30100 di View
