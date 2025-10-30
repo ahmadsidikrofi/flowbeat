@@ -58,9 +58,13 @@ export default function Home() {
     }
 
     const { name, photo, bpm, spo2 } = userData;
-    const profilePhoto = photo && photo !== 'default-avatar-profile.jpg'
-    ? { uri: `${API_URL}/images/${photo}` }
-    : require('../assets/img/default-avatar-profile.jpg');
+    // const profilePhoto = photo && photo !== 'default-avatar-profile.jpg'
+    // ? { uri: `${API_URL}/images/${photo}` }
+    // : require('../assets/img/default-avatar-profile.jpg');
+    const profilePhoto = photo 
+        ? { uri: `${API_URL}/${photo}` } 
+        : require('../assets/img/default-avatar-profile.jpg');
+
     console.log('data:',userData)
     console.log('Profile photo URL:', `${API_URL}/${photo}`);
 

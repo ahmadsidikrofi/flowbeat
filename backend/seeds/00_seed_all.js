@@ -26,7 +26,7 @@ exports.seed = async function(knex) {
       name: 'Santoso Budi',
       phone_number: '123',
       password: hashedPass1,
-      photo: 'default-avatar-profile.jpg',
+      photo: 'avatar-profile.png',
       address: 'Jl. Merdeka No.1'
     },
     {

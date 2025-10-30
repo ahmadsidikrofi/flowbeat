@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const path = require('path');
 
 // Konfigurasi koneksi ke MySQL dengan env
 const dotenv = require('dotenv');
@@ -41,6 +42,8 @@ db.connect(err => {
 
 const verifyToken = require('./middleware/auth'); //menggunakan middleware
 const JWT_SECRET = process.env.JWT_SECRET;
+
+
 
 // =====================
 // Test ROUTES
@@ -122,10 +125,22 @@ app.get('/api/home', verifyToken, (req, res) => {
         FROM lansia l WHERE l.id = ?`;
     db.query(sql, [userId], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json(result[0]);
+        if (result.length === 0) return res.status(404).json({ message: 'User not found' });
+
+        const user = result[0];
+
+        // ✅ Tambahkan path relatif (jika ada foto)
+        if (user.photo) {
+        user.photo = `images/${user.photo}`;
+        }
+
+        res.json(user);
     });
 });
 
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // ---------------------
 // CRUD: LANSIA
