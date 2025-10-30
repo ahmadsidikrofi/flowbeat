@@ -15,7 +15,7 @@ const CreateAccount = () => {
                     <ThemedText style={{ fontSize: 16, fontWeight: '400', color: '#ef4444' }}>Flowbeat Account</ThemedText>
                     <ThemedView style={{ marginTop: 18 }}>
                         <ThemedText style={{ fontSize: 18, fontWeight: '400' }}>Nama lengkap</ThemedText>
-                        <ThemedText style={{ fontSize: 18, fontWeight: '400', color: '#737373' }}>{user?.first_name} {user?.last_name}</ThemedText>
+                        <ThemedText style={{ fontSize: 18, fontWeight: '400', color: '#737373' }}>{user?.name}</ThemedText>
                     </ThemedView>
                     <ThemedView style={{ marginVertical: 18 }}>
                         <ThemedText style={{ fontSize: 18, fontWeight: '400' }}>Nomor handphone</ThemedText>

@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUserData = async (token) => {
         try {
-            const res = await axios.get(`${baseURL}/api/auth/patient`, {
+            const res = await axios.get(`${baseURL}/api/user`, {
             // const res = await axios.get('https://35c1-2001-448a-4007-45ff-d0f3-ab3e-9f07-521.ngrok-free.app/api/auth/patient', {
                 headers: { Authorization: `Bearer ${token}` }
             })

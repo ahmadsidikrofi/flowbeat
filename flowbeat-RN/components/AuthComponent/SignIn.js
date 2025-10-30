@@ -20,7 +20,7 @@ const SignIn = ({ setSignInModal, setAuthModal }) => {
 
     const handleSignInPatient = async () => {
         setIsLoading(true)
-        await axios.post(`${baseURL}/api/auth/sign-in`, {
+        await axios.post(`${baseURL}/api/login`, {
             phone_number: phoneNumber,
             password: password
         }).then(async(res) => {
