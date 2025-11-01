@@ -209,11 +209,8 @@ export default function EditProfile() {
                     />
 
                     {/* Ganti Foto */}
-                    <TouchableOpacity style={styles.photoButton} onPress={pickPhoto}>
-                        <Icon name="camera-outline" size={20} color="#3B82F6" />
-                        <Text style={styles.photoButtonText}>
-                            {photo ? "Ubah Foto Profil" : "Pilih Foto Profil"}
-                        </Text>
+                    <TouchableOpacity style={styles.input} onPress={pickPhoto}>
+                        <Text style={{ color: "#666" }}>{photo ? "Foto Dipilih" : "Ubah Foto Profil"}</Text>
                     </TouchableOpacity>
 
                     {/* Tombol Simpan */}
