@@ -136,3 +136,9 @@ Artinya:
 Jadi kamu tidak perlu lagi menulis userData.photo, cukup photo.
 
 
+untuk keperluan edit profile
+npm install multer
+
+const multer = require('multer');
+const fs = require('fs');
+

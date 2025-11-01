@@ -15,6 +15,9 @@ app.use(bodyParser.json());
 const bcrypt = require('bcryptjs'); //untuk autentikasi
 const jwt = require('jsonwebtoken'); //untuk autentikasi
 
+const multer = require('multer'); //untuk update akun
+const fs = require('fs');
+
 //port dengan env (tidak hardcode)
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -162,6 +165,60 @@ app.get('/api/akun', verifyToken, (req, res) => {
 
         res.json(user);
     });
+});
+
+// =====================
+// KONFIGURASI UPLOAD FOTO
+// =====================
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dir = path.join(__dirname, 'images');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+        cb(null, dir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueName = Date.now() + '-' + file.originalname.replace(/\s+/g, '_');
+        cb(null, uniqueName);
+    },
+});
+
+const upload = multer({ storage });
+
+// =====================
+// Update Profil
+// =====================
+app.put('/api/edit-profile', verifyToken, upload.single('photo'), async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, phone_number, password, address } = req.body;
+        const photo = req.file ? req.file.filename : null;
+
+        // Buat query dinamis (jika password dikosongkan, jangan update)
+        let sql = 'UPDATE lansia SET name = ?, phone_number = ?, address = ?';
+        const params = [name, phone_number, address];
+
+        if (photo) {
+        sql += ', photo = ?';
+        params.push(photo);
+        }
+
+        if (password && password.trim() !== '') {
+        const hashed = await bcrypt.hash(password, 10);
+        sql += ', password = ?';
+        params.push(hashed);
+        }
+
+        sql += ' WHERE id = ?';
+        params.push(userId);
+
+        db.query(sql, params, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Profil berhasil diperbarui' });
+        });
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ message: 'Gagal memperbarui profil' });
+    }
 });
 
 // ---------------------
