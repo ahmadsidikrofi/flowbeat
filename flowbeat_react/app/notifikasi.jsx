@@ -43,6 +43,27 @@ export default function Notifikasi() {
         );
     }
 
+    const formatDateTime = (datetime) => {
+        if (!datetime) return '';
+
+        const date = new Date(datetime);
+
+        // Format tanggal ke Bahasa Indonesia
+        const tanggal = date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+        });
+
+        // Format waktu (jam dan menit)
+        const waktu = date.toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+
+        return `${tanggal} pukul ${waktu}`;
+        };
+
     return (
         <ProtectedRoute>
             <View style={styles.container}>
@@ -54,10 +75,12 @@ export default function Notifikasi() {
                     {notifikasiList.map((item) => (
                     <View key={item.id} style={styles.card}>
                         <View style={styles.cardHeader}>
-                        <Text style={styles.cardTitle}>{item.title}</Text>
-                        <Text style={styles.cardDate}>{item.date}</Text>
+                            <Text style={styles.cardTitle}>{item.title}</Text>
+                            <Text style={styles.cardDate}>
+                                {formatDateTime(item.created_at)}
+                            </Text>
                         </View>
-                        <Text style={styles.cardContent}>{item.pesan}</Text>
+                        <Text style={styles.cardContent}>{item.deskripsi}</Text>
                     </View>
                     ))}
                 </ScrollView>

@@ -57,24 +57,31 @@ exports.seed = async function(knex) {
     lansia_id: faker.number.int({ min: 1, max: 2 }),
     nilai: faker.number.int({ min: 70, max: 120 })
   }));
-
-
   await knex('detak_jantung').insert(bpmLansia);
 
 
   //notif
   await knex('notifikasi').insert([
     {
-      id: 1,
+      id: 1, //gk harus pake id
       lansia_id: 1,
-      title: 'Peringatan Detak Jantung',
-      deskripsi: 'Detak jantung melebihi batas normal'
+      title: 'Info tanda vital',
+      deskripsi: 'Kondisi Detak Jantung dan Oksigen tubuh anda sedang kurang baik'
     },
     {
-      id: 2,
+      lansia_id: 1,
+      title: 'Info tanda vital',
+      deskripsi: 'Istirahat sejenak untuk memulihkan kondisi anda menjadi lebih baik'
+    },
+    {
       lansia_id: 2,
-      title: 'Koneksi Perangkat',
-      deskripsi: 'Perangkat Omron berhasil terhubung'
+      title: 'Info tanda vital',
+      deskripsi: 'Istirahat sejenak untuk memulihkan kondisi anda menjadi lebih baik'
+    },
+    {
+      lansia_id: 2,
+      title: 'Info tanda vital',
+      deskripsi: 'Kondisi Detak Jantung dan Oksigen tubuh anda sedang kurang baik'
     }
   ]);
 };

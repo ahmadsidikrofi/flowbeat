@@ -147,7 +147,7 @@ export default function EditProfile() {
                     <Text style={styles.subtitle}>Perbarui Akun</Text>
 
                     {/* Foto Preview */}
-                    {photo && <Image source={{ uri: photo }} style={styles.previewImage} />}
+                    {/* {photo && <Image source={{ uri: photo }} style={styles.previewImage} />} */}
 
                     {/* Nama Lengkap */}
                     <TextInput 
