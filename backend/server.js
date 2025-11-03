@@ -372,9 +372,16 @@ app.post('/detak-jantung', (req, res) => {
 // CRUD: Notifikasi
 // ---------------------
 
-app.get('/notifikasi', (req, res) => {
-    db.query('SELECT * FROM notifikasi', (err, results) => {
-        if (err) return res.status(500).json({ error: err });
+
+app.get('/notifikasi', verifyToken, (req, res) => {
+    const userId = req.user.id;
+    const sql = 'SELECT * FROM notifikasi WHERE lansia_id = ? ORDER BY created_at DESC';
+    
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: err.message });
+        }
         res.json(results);
     });
 });

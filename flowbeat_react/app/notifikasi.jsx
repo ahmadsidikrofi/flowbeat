@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 export default function Notifikasi() {
@@ -12,36 +13,34 @@ export default function Notifikasi() {
 
     // 2. Gunakan useEffect untuk mengambil data dari API
     useEffect(() => {
-        // Tentukan URL API
-        const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/notifikasi`;
+        const fetchNotifikasi = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) {
+                    console.warn("Token tidak ditemukan");
+                    return;
+                }
 
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
 
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
+                const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/notifikasi`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                    signal: controller.signal,
+                });
 
-        fetch(API_URL, { signal: controller.signal })
-            .then(res => {
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            return res.json();
-            })
-            .then(data => setNotifikasiList(data))
-            .catch(err => console.error("Gagal mengambil notifikasi:", err))
-            .finally(() => setIsLoading(false));
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                const data = await res.json();
+                setNotifikasiList(data);
+            } catch (err) {
+                console.error("Gagal mengambil notifikasi:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-        return () => clearTimeout(timeout);
-    }, []); // Array kosong berarti efek ini hanya dijalankan sekali setelah render pertama
-
-    // --- Komponen Pemuatan (Loading) ---
-    if (isLoading) {
-        return (
-            <ProtectedRoute>
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#3B82F6" />
-                    <Text style={styles.loadingText}>Memuat notifikasi...</Text>
-                </View>
-            </ProtectedRoute>
-        );
-    }
+        fetchNotifikasi();
+    }, []);
 
     const formatDateTime = (datetime) => {
         if (!datetime) return '';
