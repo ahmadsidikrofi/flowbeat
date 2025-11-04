@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { 
+    View, 
+    TextInput, 
+    Text, 
+    TouchableOpacity, 
+    StyleSheet, 
+    Alert, 
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
+    TouchableWithoutFeedback,
+    Keyboard,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -33,69 +45,76 @@ export default function LoginScreen() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-                <Text style={styles.logo}>FlowBeat</Text>
-                <Text style={styles.title}>Masuk</Text>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+                        <Text style={styles.logo}>FlowBeat</Text>
+                        <Text style={styles.title}>Masuk</Text>
 
-                {/* Input Nomor Handphone */}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Nomor Handphone"
-                        placeholderTextColor="#B0B0B0"
-                        keyboardType="phone-pad"
-                        onChangeText={setPhone}
-                        value={phone_number}
-                        maxLength={15}
-                        autoCapitalize="none"
-                    />
-                </View>
+                        {/* Input Nomor Handphone */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Nomor Handphone"
+                                placeholderTextColor="#B0B0B0"
+                                keyboardType="phone-pad"
+                                onChangeText={setPhone}
+                                value={phone_number}
+                                maxLength={15}
+                                autoCapitalize="none"
+                            />
+                        </View>
 
-                {/* Input Kata Sandi */}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Kata Sandi"
-                        placeholderTextColor="#B0B0B0"
-                        secureTextEntry={!showPassword}
-                        onChangeText={setPassword}
-                        value={password}
-                        autoCapitalize="none"
-                    />
-                    <TouchableOpacity 
-                        style={styles.eyeIcon} 
-                        onPress={() => setShowPassword(!showPassword)}
-                    >
-                        <Ionicons 
-                            name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                            size={24} 
-                            color="#B0B0B0" 
-                        />
-                    </TouchableOpacity>
-                </View>
-                
-                {/* Tombol Masuk */}
-                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                    <Text style={styles.loginButtonText}>MASUK</Text>
-                </TouchableOpacity>
+                        {/* Input Kata Sandi */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Kata Sandi"
+                                placeholderTextColor="#B0B0B0"
+                                secureTextEntry={!showPassword}
+                                onChangeText={setPassword}
+                                value={password}
+                                autoCapitalize="none"
+                            />
+                            <TouchableOpacity 
+                                style={styles.eyeIcon} 
+                                onPress={() => setShowPassword(!showPassword)}
+                            >
+                                <Ionicons 
+                                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                                    size={24} 
+                                    color="#B0B0B0" 
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        
+                        {/* Tombol Masuk */}
+                        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+                            <Text style={styles.loginButtonText}>MASUK</Text>
+                        </TouchableOpacity>
 
-                {/* Lupa Password */}
-                {/* <TouchableOpacity onPress={() => console.log('Lupa password ditekan')}> */}
-                <TouchableOpacity onPress={() => router.push('/home')}>
-                    <Text style={styles.forgotPassword}>Lupa password?</Text>
-                </TouchableOpacity>
+                        {/* Lupa Password */}
+                        {/* <TouchableOpacity onPress={() => console.log('Lupa password ditekan')}> */}
+                        <TouchableOpacity onPress={() => router.push('/home')}>
+                            <Text style={styles.forgotPassword}>Lupa password?</Text>
+                        </TouchableOpacity>
 
-                <View style={styles.divider} />
+                        <View style={styles.divider} />
 
-                {/* Belum punya akun? */}
-                <Text style={styles.noAccountText}>Belum mempunyai akun?</Text>
-                
-                {/* Tombol Buat Akun */}
-                <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/registpage')}>
-                    <Text style={styles.registerButtonText}>BUAT AKUN</Text>
-                </TouchableOpacity>
+                        {/* Belum punya akun? */}
+                        <Text style={styles.noAccountText}>Belum mempunyai akun?</Text>
+                        
+                        {/* Tombol Buat Akun */}
+                        <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/registpage')}>
+                            <Text style={styles.registerButtonText}>BUAT AKUN</Text>
+                        </TouchableOpacity>
 
-            </ScrollView>
+                    </ScrollView>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }

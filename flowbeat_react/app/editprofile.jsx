@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator, ScrollView } from "react-native";
+import { View, 
+    Text, 
+    TextInput, 
+    TouchableOpacity, 
+    StyleSheet, 
+    Alert, 
+    ActivityIndicator, 
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
+    TouchableWithoutFeedback,
+    Keyboard,
+} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -142,97 +154,103 @@ export default function EditProfile() {
     return (
         <ProtectedRoute>
             <SafeAreaView style={styles.container}>
-                <ScrollView contentContainerStyle={styles.scrollContent}>
-                    <Text style={styles.title}>FlowBeat</Text>
-                    <Text style={styles.subtitle}>Perbarui Akun</Text>
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                >
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <ScrollView contentContainerStyle={styles.scrollContent}>
+                            <Text style={styles.title}>FlowBeat</Text>
+                            <Text style={styles.subtitle}>Perbarui Akun</Text>
 
-                    {/* Foto Preview */}
-                    {/* {photo && <Image source={{ uri: photo }} style={styles.previewImage} />} */}
+                            {/* Foto Preview */}
+                            {/* {photo && <Image source={{ uri: photo }} style={styles.previewImage} />} */}
 
-                    {/* Nama Lengkap */}
-                    <TextInput 
-                        style={styles.input} 
-                        placeholder="Nama Lengkap" 
-                        placeholderTextColor="#666"
-                        value={name}
-                        onChangeText={setName}
-                    />
+                            {/* Nama Lengkap */}
+                            <TextInput 
+                                style={styles.input} 
+                                placeholder="Nama Lengkap" 
+                                placeholderTextColor="#666"
+                                value={name}
+                                onChangeText={setName}
+                            />
 
-                    {/* Nomor Handphone */}
-                    <TextInput 
-                        style={styles.input} 
-                        placeholder="Nomor Handphone" 
-                        keyboardType="phone-pad" 
-                        placeholderTextColor="#666"
-                        value={phone}
-                        onChangeText={setPhone}
-                    />
+                            {/* Nomor Handphone */}
+                            <TextInput 
+                                style={styles.input} 
+                                placeholder="Nomor Handphone" 
+                                keyboardType="phone-pad" 
+                                placeholderTextColor="#666"
+                                value={phone}
+                                onChangeText={setPhone}
+                            />
 
-                    {/* Password */}
-                    <View style={styles.passwordContainer}>
-                        <TextInput
-                            style={styles.passwordInput}
-                            placeholder="Kata Sandi Baru (opsional)"
-                            secureTextEntry={!showPassword}
-                            placeholderTextColor="#666"
-                            value={password}
-                            onChangeText={setPassword}
-                        />
-                        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                            <Icon name={showPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#777" />
-                        </TouchableOpacity>
-                    </View>
+                            {/* Password */}
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    style={styles.passwordInput}
+                                    placeholder="Kata Sandi Baru (opsional)"
+                                    secureTextEntry={!showPassword}
+                                    placeholderTextColor="#666"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+                                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                    <Icon name={showPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#777" />
+                                </TouchableOpacity>
+                            </View>
 
-                    {/* Konfirmasi Password */}
-                    <View style={styles.passwordContainer}>
-                        <TextInput
-                            style={styles.passwordInput}
-                            placeholder="Konfirmasi Kata Sandi"
-                            secureTextEntry={!showConfirmPassword}
-                            placeholderTextColor="#666"
-                            value={confirmPassword}
-                            onChangeText={setConfirmPassword}
-                        />
-                        <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                            <Icon name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#777" />
-                        </TouchableOpacity>
-                    </View>
+                            {/* Konfirmasi Password */}
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    style={styles.passwordInput}
+                                    placeholder="Konfirmasi Kata Sandi"
+                                    secureTextEntry={!showConfirmPassword}
+                                    placeholderTextColor="#666"
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                />
+                                <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                    <Icon name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#777" />
+                                </TouchableOpacity>
+                            </View>
 
-                    {/* Alamat */}
-                    <TextInput
-                        style={[styles.input, { height: 70, textAlignVertical: "top" }]}
-                        placeholder="Alamat"
-                        multiline
-                        placeholderTextColor="#666"
-                        value={address}
-                        onChangeText={setAddress}
-                    />
+                            {/* Alamat */}
+                            <TextInput
+                                style={[styles.input, { height: 70, textAlignVertical: "top" }]}
+                                placeholder="Alamat"
+                                multiline
+                                placeholderTextColor="#666"
+                                value={address}
+                                onChangeText={setAddress}
+                            />
 
-                    {/* Ganti Foto */}
-                    <TouchableOpacity style={styles.input} onPress={pickPhoto}>
-                        <Text style={{ color: "#666" }}>{photo ? "Foto Dipilih" : "Ubah Foto Profil"}</Text>
-                    </TouchableOpacity>
+                            {/* Ganti Foto */}
+                            <TouchableOpacity style={styles.input} onPress={pickPhoto}>
+                                <Text style={{ color: "#666" }}>{photo ? "Foto Dipilih" : "Ubah Foto Profil"}</Text>
+                            </TouchableOpacity>
 
-                    {/* Tombol Simpan */}
-                    <TouchableOpacity 
-                        style={styles.saveButton} 
-                        onPress={handleSave}
-                        disabled={loading}
-                    >
-                        <Text style={styles.saveButtonText}>
-                            {loading ? "MENYIMPAN..." : "SIMPAN PERUBAHAN"}
-                        </Text>
-                    </TouchableOpacity>
+                            {/* Tombol Simpan */}
+                            <TouchableOpacity 
+                                style={styles.saveButton} 
+                                onPress={handleSave}
+                                disabled={loading}
+                            >
+                                <Text style={styles.saveButtonText}>
+                                    {loading ? "MENYIMPAN..." : "SIMPAN PERUBAHAN"}
+                                </Text>
+                            </TouchableOpacity>
 
-                    {/* Tombol Kembali */}
-                    <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                        <Icon name="arrow-back-outline" size={20} color="#fff" />
-                        <Text style={styles.backButtonText}>KEMBALI</Text>
-                    </TouchableOpacity>
-                </ScrollView>
+                            {/* Tombol Kembali */}
+                            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                                <Icon name="arrow-back-outline" size={20} color="#fff" />
+                                <Text style={styles.backButtonText}>KEMBALI</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+                    </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
             </SafeAreaView>
         </ProtectedRoute>
-        
     );
 }
 

@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import {
+    View,
+    TextInput,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    ScrollView,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    TouchableWithoutFeedback,
+    Keyboard,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router'; // Asumsi Anda menggunakan Expo Router
@@ -43,105 +55,113 @@ export default function RegistPage() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-                <Text style={styles.logo}>FlowBeat</Text>
-                <Text style={styles.title}>Buat Akun</Text>
+                {/* Tambahkan KeyboardAvoidingView agar form naik saat keyboard muncul */}
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                {/* Tambahkan TouchableWithoutFeedback agar keyboard tertutup saat tap di luar input */}
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+                        <Text style={styles.logo}>FlowBeat</Text>
+                        <Text style={styles.title}>Buat Akun</Text>
 
-                {/* 1. Nama Lengkap */}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Nama Lengkap"
-                        placeholderTextColor="#B0B0B0"
-                        onChangeText={setFullName}
-                        value={fullName}
-                    />
-                </View>
+                        {/* 1. Nama Lengkap */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Nama Lengkap"
+                                placeholderTextColor="#B0B0B0"
+                                onChangeText={setFullName}
+                                value={fullName}
+                            />
+                        </View>
 
-                {/* 2. Nomor Handphone */}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Nomor Handphone"
-                        placeholderTextColor="#B0B0B0"
-                        keyboardType="phone-pad"
-                        onChangeText={setPhone}
-                        value={phone}
-                        maxLength={15}
-                    />
-                </View>
+                        {/* 2. Nomor Handphone */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Nomor Handphone"
+                                placeholderTextColor="#B0B0B0"
+                                keyboardType="phone-pad"
+                                onChangeText={setPhone}
+                                value={phone}
+                                maxLength={15}
+                            />
+                        </View>
 
-                {/* 3. Kata Sandi */}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Kata Sandi"
-                        placeholderTextColor="#B0B0B0"
-                        secureTextEntry={!showPassword}
-                        onChangeText={setPassword}
-                        value={password}
-                    />
-                    <TouchableOpacity 
-                        style={styles.eyeIcon} 
-                        onPress={() => setShowPassword(!showPassword)}
-                    >
-                        <Ionicons 
-                            name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                            size={24} 
-                            color="#B0B0B0" 
-                        />
-                    </TouchableOpacity>
-                </View>
-                
-                {/* 4. Konfirmasi Kata Sandi */}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Konfirmasi Kata Sandi"
-                        placeholderTextColor="#B0B0B0"
-                        secureTextEntry={!showConfirmPassword}
-                        onChangeText={setConfirmPassword}
-                        value={confirmPassword}
-                    />
-                    <TouchableOpacity 
-                        style={styles.eyeIcon} 
-                        onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                        <Ionicons 
-                            name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} 
-                            size={24} 
-                            color="#B0B0B0" 
-                        />
-                    </TouchableOpacity>
-                </View>
+                        {/* 3. Kata Sandi */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Kata Sandi"
+                                placeholderTextColor="#B0B0B0"
+                                secureTextEntry={!showPassword}
+                                onChangeText={setPassword}
+                                value={password}
+                            />
+                            <TouchableOpacity 
+                                style={styles.eyeIcon} 
+                                onPress={() => setShowPassword(!showPassword)}
+                            >
+                                <Ionicons 
+                                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                                    size={24} 
+                                    color="#B0B0B0" 
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        
+                        {/* 4. Konfirmasi Kata Sandi */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Konfirmasi Kata Sandi"
+                                placeholderTextColor="#B0B0B0"
+                                secureTextEntry={!showConfirmPassword}
+                                onChangeText={setConfirmPassword}
+                                value={confirmPassword}
+                            />
+                            <TouchableOpacity 
+                                style={styles.eyeIcon} 
+                                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                                <Ionicons 
+                                    name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} 
+                                    size={24} 
+                                    color="#B0B0B0" 
+                                />
+                            </TouchableOpacity>
+                        </View>
 
-                {/* 5. Alamat (Multi-line) */}
-                <View style={[styles.inputContainer, styles.addressInputContainer]}>
-                    <TextInput
-                        style={styles.addressInput}
-                        placeholder="Alamat"
-                        placeholderTextColor="#B0B0B0"
-                        onChangeText={setAddress}
-                        value={address}
-                        multiline={true}
-                        numberOfLines={4}
-                    />
-                </View>
-                
-                {/* Tombol Daftar */}
-                <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-                {/* <TouchableOpacity style={styles.registerButton} onPress={()=>router.push('/home')}> */}
-                    <Text style={styles.registerButtonText}>DAFTAR</Text>
-                </TouchableOpacity>
+                        {/* 5. Alamat (Multi-line) */}
+                        <View style={[styles.inputContainer, styles.addressInputContainer]}>
+                            <TextInput
+                                style={styles.addressInput}
+                                placeholder="Alamat"
+                                placeholderTextColor="#B0B0B0"
+                                onChangeText={setAddress}
+                                value={address}
+                                multiline={true}
+                                numberOfLines={4}
+                            />
+                        </View>
+                        
+                        {/* Tombol Daftar */}
+                        <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+                        {/* <TouchableOpacity style={styles.registerButton} onPress={()=>router.push('/home')}> */}
+                            <Text style={styles.registerButtonText}>DAFTAR</Text>
+                        </TouchableOpacity>
 
-                {/* Tombol Kembali */}
-                <TouchableOpacity style={styles.backButton} onPress={() => router.push('/firstpage')}>
-                {/* <TouchableOpacity style={styles.backButton} onPress={() => router.back()}> */}
-                    <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 8 }} />
-                    <Text style={styles.backButtonText}>KEMBALI</Text>
-                </TouchableOpacity>
-
-            </ScrollView>
+                        {/* Tombol Kembali */}
+                        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/firstpage')}>
+                        {/* <TouchableOpacity style={styles.backButton} onPress={() => router.back()}> */}
+                            <Ionicons name="arrow-back" size={20} color="white" style={{ marginRight: 8 }} />
+                            <Text style={styles.backButtonText}>KEMBALI</Text>
+                        </TouchableOpacity>
+                    </ScrollView>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
