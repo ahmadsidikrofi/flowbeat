@@ -227,7 +227,7 @@ export default function EditProfile() {
 
                             {/* Ganti Foto */}
                             <TouchableOpacity style={styles.input} onPress={pickPhoto}>
-                                <Text style={{ color: "#666" }}>{photo ? "Foto Dipilih" : "Ubah Foto Profil"}</Text>
+                                <Text style={{ color: "#666" }}>{photo ? photo.split('/').pop() : "Ubah Foto Profil"}</Text>
                             </TouchableOpacity>
 
                             {/* Tombol Simpan */}

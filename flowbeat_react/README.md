@@ -25,3 +25,5 @@ npx expo install @react-native-async-storage/async-storage
 
 buat upload image
 npx expo install expo-image-picker
+
+untuk full brightness npx expo install expo-brightness
