@@ -193,28 +193,53 @@ app.put('/api/edit-profile', verifyToken, upload.single('photo'), async (req, re
         const { name, phone_number, password, address } = req.body;
         const photo = req.file ? req.file.filename : null;
 
-        // Buat query dinamis (jika password dikosongkan, jangan update)
+    // Ambil data lama user (terutama foto lama)
+    db.query('SELECT photo FROM lansia WHERE id = ?', [userId], async (err, results) => {
+        if (err) {
+            console.error('Error fetching old photo:', err);
+            return res.status(500).json({ message: 'Gagal mengambil data lama' });
+        }
+
+        const oldPhoto = results[0]?.photo;
         let sql = 'UPDATE lansia SET name = ?, phone_number = ?, address = ?';
         const params = [name, phone_number, address];
 
         if (photo) {
-        sql += ', photo = ?';
-        params.push(photo);
+            sql += ', photo = ?';
+            params.push(photo);
         }
 
         if (password && password.trim() !== '') {
-        const hashed = await bcrypt.hash(password, 10);
-        sql += ', password = ?';
-        params.push(hashed);
+            const hashed = await bcrypt.hash(password, 10);
+            sql += ', password = ?';
+            params.push(hashed);
         }
 
         sql += ' WHERE id = ?';
         params.push(userId);
 
-        db.query(sql, params, (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: 'Profil berhasil diperbarui' });
+        db.query(sql, params, (err2, result) => {
+            if (err2) {
+            console.error('Error updating profile:', err2);
+            return res.status(500).json({ message: 'Gagal memperbarui profil' });
+            }
+
+            // Jika ada foto baru dan foto lama bukan null/default, hapus foto lama dari folder
+            if (photo && oldPhoto &&
+            oldPhoto !== 'default-avatar-profile.jpg' &&
+            oldPhoto !== 'avatar-profile'
+            ) {
+                const oldPath = path.join(__dirname, 'images', oldPhoto);
+                fs.unlink(oldPath, (unlinkErr) => {
+                    if (unlinkErr && unlinkErr.code !== 'ENOENT') {
+                    console.warn('Gagal menghapus foto lama:', unlinkErr.message);
+                    }
+                });
+            }
+
+            res.json({ message: 'Profil berhasil diperbarui' });
         });
+    });
     } catch (error) {
         console.error('Error updating profile:', error);
         res.status(500).json({ message: 'Gagal memperbarui profil' });
