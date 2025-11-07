@@ -27,3 +27,46 @@ buat upload image
 npx expo install expo-image-picker
 
 untuk full brightness npx expo install expo-brightness
+
+Buat deploy
+# Install EAS CLI
+npm install -g eas-cli
+
+# Login ke Expo
+eas login
+
+# Konfigurasi project
+eas build:configure
+
+# Build APK untuk testing
+eas build --platform android --profile preview
+
+# Build AAB untuk production (Play Store)
+eas build --platform android --profile production
+
+# Submit ke Play Store (otomatis)
+eas submit --platform android
+
+Yang Diulang Setiap Ada Perubahan:
+🔄 Ini aja yang diulang setiap ada update
+
+# 1. Ubah code kamu
+# 2. Update version di app.json
+# 3. Build ulang
+
+# Untuk testing:
+eas build --platform android --profile preview
+
+# Untuk production:
+eas build --platform android --profile production
+
+# Submit ke Play Store (kalau sudah di store):
+eas submit --platform android
+
+Update Version 📝
+Edit app.json:
+"expo": {
+    "version": "1.0.1",  // ✅ Naik dari 1.0.0 → 1.0.1
+    "android": {
+      "versionCode": 2   // ✅ Naik dari 1 → 2
+    }
