@@ -28,6 +28,10 @@ npx expo install expo-image-picker
 
 untuk full brightness npx expo install expo-brightness
 
+akses camera
+npx expo prebuild
+npx expo start -c
+
 Buat deploy
 # Install EAS CLI
 npm install -g eas-cli

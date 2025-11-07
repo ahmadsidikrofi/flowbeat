@@ -65,22 +65,55 @@ export default function EditProfile() {
     }, []);
 
     const pickPhoto = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-            Alert.alert("Izin Ditolak", "Aplikasi membutuhkan izin akses galeri untuk memilih foto.");
-            return;
-        }
+        Alert.alert(
+            "Pilih Sumber Foto",
+            "Ambil dari kamera atau pilih dari galeri?",
+            [
+            {
+                text: "Kamera",
+                onPress: async () => {
+                const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                if (status !== "granted") {
+                    Alert.alert("Izin Ditolak", "Aplikasi membutuhkan izin kamera.");
+                    return;
+                }
 
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["images"],
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.8,
-        });
+                const result = await ImagePicker.launchCameraAsync({
+                    mediaTypes: ['images'],
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    quality: 0.8,
+                });
 
-        if (!result.canceled) {
-            setPhoto(result.assets[0].uri);
-        }
+                if (!result.canceled) {
+                    setPhoto(result.assets[0].uri);
+                }
+                },
+            },
+            {
+                text: "Galeri",
+                onPress: async () => {
+                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                if (status !== "granted") {
+                    Alert.alert("Izin Ditolak", "Aplikasi membutuhkan izin galeri.");
+                    return;
+                }
+
+                const result = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ['images'],
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    quality: 0.8,
+                });
+
+                if (!result.canceled) {
+                    setPhoto(result.assets[0].uri);
+                }
+                },
+            },
+            { text: "Batal", style: "cancel" },
+            ]
+        );
     };
 
     const handleSave = async () => {
