@@ -51,7 +51,7 @@ eas build --platform android --profile production
 # Submit ke Play Store (otomatis)
 eas submit --platform android
 
-Yang Diulang Setiap Ada Perubahan:
+Yang Diulang Setiap Ada Perubahan code:
 🔄 Ini aja yang diulang setiap ada update
 
 # 1. Ubah code kamu
