@@ -142,3 +142,5 @@ npm install multer
 const multer = require('multer');
 const fs = require('fs');
 
+run ngrok
+npx ngrok http 4000
