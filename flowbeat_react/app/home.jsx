@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
+import { 
+    View, Text, StyleSheet, Image, TouchableOpacity, 
+    Linking, ActivityIndicator, Modal } 
+from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
@@ -10,11 +13,11 @@ import { EXPO_PUBLIC_API_URL } from '@env';
 
 const API_URL = EXPO_PUBLIC_API_URL;
 
-
 export default function Home() {
     const router = useRouter(); // Dapatkan hook useRouter di sini
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showWarning, setShowWarning] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -31,6 +34,11 @@ export default function Home() {
 
                 const data = await res.json();
                 setUserData(data);
+
+                // Jika data BPM tidak normal, tampilkan popup
+                if (data?.bpm && (data.bpm < 60 || data.bpm > 100)) {
+                    setShowWarning(true);
+                }
             } catch (err) {
                 console.error('Error fetching data:', err);
             } finally {
@@ -64,7 +72,7 @@ export default function Home() {
     // console.log('data:',userData)
     // console.log('Profile photo URL:', `${API_URL}/${photo}`);
 
-        // Logika status kesehatan
+    // Logika status kesehatan
     const bpmStatus =
         bpm === null
             ? 'Tidak Ada Data'
@@ -125,6 +133,7 @@ export default function Home() {
                         </View>
                     </TouchableOpacity>
 
+                    {/* CARD SPO2 */}
                     <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}>
                         <View style={styles.cardContent}>
                             <View style={styles.cardInfo}>
@@ -174,6 +183,26 @@ export default function Home() {
                         </TouchableOpacity>
                     </View>
                 </View>
+
+                {/* POPUP PERINGATAN */}
+                <Modal visible={showWarning} transparent animationType="slide">
+                    <View style={styles.overlay}>
+                        <View style={styles.warningBox}>
+                            <View style={styles.warningHeader}>
+                                <Text style={styles.warningTitle}>DETAK JANTUNGMU TIDAK NORMAL</Text>
+                                <TouchableOpacity onPress={() => setShowWarning(false)}>
+                                    <Text style={styles.closeButton}>✕</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.warningBody}>
+                                <Text style={styles.warningSubTitle}>Lakukan hal-hal berikut</Text>
+                                <Text style={styles.warningText}>1. Duduk dengan posisi yang nyaman dan pejamkan mata</Text>
+                                <Text style={styles.warningText}>2. Tarik napas dalam-dalam melalui hidung, tahan selama 3 detik, lalu buang napas</Text>
+                                <Text style={styles.warningText}>3. Ulangi langkah-langkah tersebut sampai detak jantung kembali normal</Text>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </SafeAreaView>
         </ProtectedRoute>
         
@@ -311,4 +340,54 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
+
+    //Popup warning
+    overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    },
+    warningBox: {
+        backgroundColor: '#f87171',
+        borderRadius: 10,
+        padding: 16,
+        width: '90%',
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 6,
+    },
+    warningHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    warningTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    closeButton: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    warningBody: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 10,
+    },
+    warningSubTitle: {
+        fontWeight: 'bold',
+        fontSize: 14,
+        marginBottom: 6,
+    },
+    warningText: {
+        fontSize: 13,
+        color: '#000',
+        marginBottom: 3,
+    }
+
 });
