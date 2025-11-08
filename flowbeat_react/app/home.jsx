@@ -64,6 +64,21 @@ export default function Home() {
     // console.log('data:',userData)
     // console.log('Profile photo URL:', `${API_URL}/${photo}`);
 
+        // Logika status kesehatan
+    const bpmStatus =
+        bpm === null
+            ? 'Tidak Ada Data'
+            : bpm < 60 || bpm > 100
+            ? 'Tidak Normal'
+            : 'Normal';
+
+    const spo2Status =
+        spo2 === null
+            ? 'Tidak Ada Data'
+            : spo2 < 90
+            ? 'Tidak Normal'
+            : 'Normal';
+
 
     return (
         <ProtectedRoute>
@@ -93,8 +108,17 @@ export default function Home() {
                                     <Text style={styles.valueText}>{bpm ?? '--'}</Text>
                                     <Text style={styles.unitText}>BPM</Text>
                                 </View>
-                                <View style={styles.statusLabel}>
-                                    <Text style={styles.statusText}>{bpm ? 'Normal' : 'Tidak Ada Data'}</Text>
+                                <View
+                                    style={[
+                                        styles.statusLabel,
+                                        bpmStatus === 'Tidak Normal'
+                                            ? { backgroundColor: '#FF9595' }
+                                            : bpmStatus === 'Normal'
+                                            ? { backgroundColor: '#7ae47fff' }
+                                            : { backgroundColor: '#bdbdbd' },
+                                    ]}
+                                >
+                                    <Text style={styles.statusText}>{bpmStatus}</Text>
                                 </View>
                             </View>
                             <Ionicons name="arrow-forward-sharp" size={24} color="#555" />
@@ -110,8 +134,17 @@ export default function Home() {
                                     <Text style={styles.valueText}>{spo2 ?? '--'}</Text>
                                     <Text style={styles.unitText}>%</Text>
                                 </View>
-                                <View style={styles.statusLabel}>
-                                    <Text style={styles.statusText}>{spo2 ? 'Normal' : 'Tidak Ada Data'}</Text>
+                                <View
+                                    style={[
+                                        styles.statusLabel,
+                                        spo2Status === 'Tidak Normal'
+                                            ? { backgroundColor: '#FF9595' }
+                                            : spo2Status === 'Normal'
+                                            ? { backgroundColor: '#7ae47fff' }
+                                            : { backgroundColor: '#bdbdbd' },
+                                    ]}
+                                >
+                                    <Text style={styles.statusText}>{spo2Status}</Text>
                                 </View>
                             </View>
                             <Ionicons name="arrow-forward-sharp" size={24} color="#555" />
@@ -224,7 +257,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
     },
     statusText: {
-        color: '#1e7e34',
+        color: '#000000',
         fontWeight: 'bold',
         fontSize: 12,
     },
