@@ -205,7 +205,6 @@ export default function Home() {
                 </Modal>
             </SafeAreaView>
         </ProtectedRoute>
-        
     )
 };
 
@@ -385,7 +384,7 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     warningText: {
-        fontSize: 13,
+        fontSize: 16,
         color: '#000',
         marginBottom: 3,
     }
