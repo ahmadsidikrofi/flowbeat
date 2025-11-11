@@ -56,10 +56,8 @@ app.get('/', (req, res) => {
 });
 
 // =====================
-// AUTENTIKASI dgn React Native
+// REGISTRASI
 // =====================
-
-// REGISTER
 app.post('/api/register', async (req, res) => {
     const { name, phone_number, password, address } = req.body;
     const hashed = await bcrypt.hash(password, 10);
@@ -75,7 +73,9 @@ app.post('/api/register', async (req, res) => {
     });
 });
 
+// =====================
 // LOGIN
+// =====================
 app.post('/api/login', (req, res) => {
     // console.log('Body login diterima:', req.body);
 
@@ -244,6 +244,76 @@ app.put('/api/edit-profile', verifyToken, upload.single('photo'), async (req, re
         console.error('Error updating profile:', error);
         res.status(500).json({ message: 'Gagal memperbarui profil' });
     }
+});
+
+// =====================
+// API DETAIL DATA KESEHATAN
+// =====================
+app.get('/api/kesehatan', (req, res) => {
+    const userId = req.query.userId || 1;
+
+    const sql = `
+        SELECT 
+        DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') AS waktu,
+        'detak_jantung' AS jenis,
+        nilai,
+        lansia_id
+        FROM detak_jantung
+        WHERE lansia_id = ?
+
+        UNION
+
+        SELECT 
+        DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') AS waktu,
+        'spo2' AS jenis,
+        nilai,
+        lansia_id
+        FROM spo2
+        WHERE lansia_id = ?
+
+        ORDER BY waktu DESC
+    `;
+
+    db.query(sql, [userId, userId], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        // Gabungkan berdasarkan waktu
+        const merged = {};
+        results.forEach(row => {
+        if (!merged[row.waktu]) {
+            merged[row.waktu] = { waktu: row.waktu, detak_jantung: '-', spo2: '-' };
+        }
+        if (row.jenis === 'detak_jantung') {
+            merged[row.waktu].detak_jantung = row.nilai;
+        } else if (row.jenis === 'spo2') {
+            merged[row.waktu].spo2 = row.nilai;
+        }
+        });
+
+        // Konversi nama hari ke Bahasa Indonesia
+        const hariIndonesia = {
+        Sunday: 'Minggu',
+        Monday: 'Senin',
+        Tuesday: 'Selasa',
+        Wednesday: 'Rabu',
+        Thursday: 'Kamis',
+        Friday: 'Jumat',
+        Saturday: 'Sabtu'
+        };
+
+        const final = Object.values(merged).map(item => {
+        const date = new Date(item.waktu);
+        const hari = hariIndonesia[date.toLocaleDateString('en-US', { weekday: 'long' })];
+        const tanggal = `${hari}, ${date.getDate()} ${date.getHours().toString().padStart(2, '0')}.${date.getMinutes().toString().padStart(2, '0')}`;
+        return {
+            tanggal,
+            detak_jantung: item.detak_jantung,
+            spo2: item.spo2
+        };
+        });
+
+        res.json(final);
+    });
 });
 
 // =====================

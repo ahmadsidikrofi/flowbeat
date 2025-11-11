@@ -108,7 +108,7 @@ export default function Home() {
                 {/* DATA KESEHATAN */}
                 <View style={styles.mainContent}>
                     <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}
-                        onPress={() => router.push('/riwayatbpm')}
+                        onPress={() => router.push('/detailkesehatan')}
                     >
                         <View style={styles.cardContent}>
                             <View style={styles.cardInfo}>
