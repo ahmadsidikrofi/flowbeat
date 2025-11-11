@@ -246,6 +246,51 @@ app.put('/api/edit-profile', verifyToken, upload.single('photo'), async (req, re
     }
 });
 
+// =====================
+// API RIWAYAT DETAK JANTUNG
+// =====================
+app.get('/api/detak-jantung', verifyToken, (req, res) => {
+    const userId = req.user.id;
+    const periode = req.query.periode || 'Minggu'; // Hari, Minggu, Bulan, Tahun
+    
+    let dateFilter = '';
+    const now = new Date();
+    
+    switch (periode) {
+        case 'Hari':
+            // Last 24 hours
+            dateFilter = 'AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)';
+            break;
+        case 'Minggu':
+            // Last 7 days
+            dateFilter = 'AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            break;
+        case 'Bulan':
+            // Last 30 days
+            dateFilter = 'AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
+            break;
+        case 'Tahun':
+            // Last 12 months
+            dateFilter = 'AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)';
+            break;
+    }
+    
+    const sql = `
+        SELECT id, lansia_id, nilai, created_at 
+        FROM detak_jantung 
+        WHERE lansia_id = ? ${dateFilter}
+        ORDER BY created_at DESC
+    `;
+    
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
 // ---------------------
 // CRUD: LANSIA
 // ---------------------

@@ -107,7 +107,9 @@ export default function Home() {
 
                 {/* DATA KESEHATAN */}
                 <View style={styles.mainContent}>
-                    <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}>
+                    <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}
+                        onPress={() => router.push('/riwayatbpm')}
+                    >
                         <View style={styles.cardContent}>
                             <View style={styles.cardInfo}>
                                 <Ionicons name="heart-outline" size={32} color="#555" />

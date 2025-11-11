@@ -74,3 +74,6 @@ Edit app.json:
     "android": {
       "versionCode": 2   // ✅ Naik dari 1 → 2
     }
+
+untuk show diagram
+npm install react-native-chart-kit react-native-svg
