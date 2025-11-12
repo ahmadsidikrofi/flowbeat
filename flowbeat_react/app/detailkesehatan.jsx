@@ -45,7 +45,7 @@ export default function DetailKesehatan() {
 
             {/* Header Tabel */}
             <View style={styles.tableHeader}>
-                <Text style={[styles.headerCell, { flex: 2 }]}>Tanggal</Text>
+                <Text style={[styles.headerCell]}>Tanggal</Text>
                 <Text style={styles.headerCell}>Detak Jantung</Text>
                 <Text style={styles.headerCell}>Oksigen Tubuh</Text>
             </View>
@@ -58,7 +58,7 @@ export default function DetailKesehatan() {
 
                     return (
                         <View key={index} style={styles.row}>
-                        <Text style={[styles.cell, { flex: 2 }]}>{item.tanggal}</Text>
+                        <Text style={[styles.tgl]}>{item.tanggal}</Text>
 
                         <Text style={[styles.cell, highHeart ? styles.danger : null]}>
                             {item.detak_jantung}
@@ -98,10 +98,9 @@ const styles = StyleSheet.create({
     tableHeader: {
         flexDirection: 'row',
         backgroundColor: '#E5E7EB',
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
         borderColor: '#D1D5DB',
-        paddingVertical: 8,
+        paddingVertical: 14,
+        alignItems: 'center',
     },
     headerCell: {
         flex: 1,
@@ -116,16 +115,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderColor: '#E5E7EB',
-        paddingVertical: 10,
+        paddingVertical: 6,
     },
     cell: {
         flex: 1,
         textAlign: 'center',
+        fontSize: 16,
+    },
+    tgl:{
+        paddingHorizontal:10,
         fontSize: 14,
+        color:'#979797ff'
     },
     danger: {
         backgroundColor: '#FF9595',
-        borderRadius: 4,
         paddingVertical: 4,
     },
     button: {

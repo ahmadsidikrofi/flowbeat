@@ -304,7 +304,7 @@ app.get('/api/kesehatan', (req, res) => {
         const final = Object.values(merged).map(item => {
         const date = new Date(item.waktu);
         const hari = hariIndonesia[date.toLocaleDateString('en-US', { weekday: 'long' })];
-        const tanggal = `${hari}, ${date.getDate()} ${date.getHours().toString().padStart(2, '0')}.${date.getMinutes().toString().padStart(2, '0')}`;
+        const tanggal = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}\n${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
         return {
             tanggal,
             detak_jantung: item.detak_jantung,

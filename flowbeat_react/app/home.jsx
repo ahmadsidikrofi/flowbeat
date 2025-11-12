@@ -136,7 +136,9 @@ export default function Home() {
                     </TouchableOpacity>
 
                     {/* CARD SPO2 */}
-                    <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}>
+                    <TouchableOpacity style={[styles.healthCard, { backgroundColor: "#e0eaff" }]}
+                        onPress={() => router.push('/detailkesehatan')}
+                    >
                         <View style={styles.cardContent}>
                             <View style={styles.cardInfo}>
                                 <FontAwesome5 name="wind" size={28} color="#555" />
