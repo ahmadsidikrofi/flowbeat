@@ -137,6 +137,39 @@ app.get('/api/home', verifyToken, (req, res) => {
         user.photo = `images/${user.photo}`;
         }
 
+            // Deteksi kondisi tidak normal dan catat notifikasi
+        const lansiaId = userId;
+
+        // Cek nilai detak jantung dan SpO2
+        if (user.bpm && (user.bpm < 60 || user.bpm > 100)) {
+            const title = 'Detak Jantung Tidak Normal';
+            const deskripsi = 'Detak jantung tidak normal. Duduk dengan posisi yang nyaman dan pejamkan mata. Tarik napas dalam-dalam selama 3 detik lalu buang napas.';
+            
+            db.query(
+                'INSERT INTO notifikasi (lansia_id, title, deskripsi) VALUES (?, ?, ?)',
+                [lansiaId, title, deskripsi],
+                (err) => {
+                    if (err) console.error('Gagal insert notifikasi BPM:', err.message);
+                }
+            );
+        }
+
+        if (user.spo2 && user.spo2 < 90) {
+            const title = 'Oksigen Tubuh Tidak Normal';
+            let deskripsi = 'Nilai SpO₂ di bawah 90%. Duduk tegak, tarik napas dalam perlahan, dan pindah ke tempat dengan ventilasi baik.';
+            if (user.spo2 < 88) {
+                deskripsi = 'Nilai SpO₂ di bawah 88%. Segera hubungi IGD.';
+            }
+
+            db.query(
+                'INSERT INTO notifikasi (lansia_id, title, deskripsi) VALUES (?, ?, ?)',
+                [lansiaId, title, deskripsi],
+                (err) => {
+                    if (err) console.error('Gagal insert notifikasi SpO2:', err.message);
+                }
+            );
+        }
+
         res.json(user);
     });
 });

@@ -9,6 +9,8 @@ import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router'; 
 import ProtectedRoute from '../components/ProtectedRoute';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Vibration } from 'react-native';
+import { Audio } from 'expo-av';
 import { EXPO_PUBLIC_API_URL } from '@env';
 
 const API_URL = EXPO_PUBLIC_API_URL;
@@ -38,7 +40,14 @@ export default function Home() {
                 // Jika data BPM tidak normal, tampilkan popup
                 if (data?.bpm && (data.bpm < 60 || data.bpm > 100)) {
                     setShowWarning(true);
+                    triggerAlert('Detak jantung tidak normal');
                 }
+
+                if (data?.spo2 && data.spo2 < 90) {
+                    setShowWarning(true);
+                    triggerAlert('Oksigen tubuh rendah');
+                }
+
             } catch (err) {
                 console.error('Error fetching data:', err);
             } finally {
@@ -86,6 +95,20 @@ export default function Home() {
             : spo2 < 90
             ? 'Tidak Normal'
             : 'Normal';
+
+    async function triggerAlert(type) {
+        // Getar 2 kali
+        Vibration.vibrate([500, 500, 500]);
+
+        // Mainkan suara alarm singkat
+        const { sound } = await Audio.Sound.createAsync(
+            require('../assets/sounds/Nokia.mp3') // pastikan file ini ada
+        );
+        await sound.playAsync();
+
+        // console.log(`${type} - notifikasi dipicu`);
+    }
+
 
 
     return (
@@ -193,7 +216,7 @@ export default function Home() {
                     <View style={styles.overlay}>
                         <View style={styles.warningBox}>
                             <View style={styles.warningHeader}>
-                                <Text style={styles.warningTitle}>DETAK JANTUNGMU TIDAK NORMAL</Text>
+                                <Text style={styles.warningTitle}>KONDISI KESEHATAN TIDAK NORMAL</Text>
                                 <TouchableOpacity onPress={() => setShowWarning(false)}>
                                     <Text style={styles.closeButton}>✕</Text>
                                 </TouchableOpacity>
@@ -201,7 +224,7 @@ export default function Home() {
                             <View style={styles.warningBody}>
                                 <Text style={styles.warningSubTitle}>Lakukan hal-hal berikut</Text>
                                 <Text style={styles.warningText}>1. Duduk dengan posisi yang nyaman dan pejamkan mata</Text>
-                                <Text style={styles.warningText}>2. Tarik napas dalam-dalam melalui hidung, tahan selama 3 detik, lalu buang napas</Text>
+                                <Text style={styles.warningText}>2. Tarik napas dalam-dalam, tahan selama 3 detik, lalu buang napas</Text>
                                 <Text style={styles.warningText}>3. Ulangi langkah-langkah tersebut sampai detak jantung kembali normal</Text>
                             </View>
                         </View>
