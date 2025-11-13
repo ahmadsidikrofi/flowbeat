@@ -67,6 +67,10 @@ eas build --platform android --profile production
 # Submit ke Play Store (kalau sudah di store):
 eas submit --platform android
 
+build local
+npx expo prebuild -p android
+cd android && ./gradlew assembleRelease
+
 Update Version 📝
 Edit app.json:
 "expo": {
@@ -80,3 +84,14 @@ npm install react-native-chart-kit react-native-svg
 
 untuk dering dna getar
 npx expo install expo-av
+
+deploy non eas expo
+npx expo prebuild
+cd android
+./gradlew assembleDebug
+npx expo run:android
+hasil apk ada di android/app/build/outputs/apk/debug/app-debug.apk
+
+klo eror di ./gradlew assembleDebug, buka path C:\Users\testl\Documents\TelU\Pascasarjana\Tesis\References\Jurnal Arsitektur Omron\code jurnal jeemi\flowbeat_code\flowbeat\flowbeat_react\android di android studio
+pilih menu Build → Build Bundle(s) / APK(s) → Build APK(s)
+android/app/build/outputs/apk/debug/app-debug.apk
