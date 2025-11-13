@@ -77,3 +77,6 @@ Edit app.json:
 
 untuk show diagram
 npm install react-native-chart-kit react-native-svg
+
+untuk dering dna getar
+npx expo install expo-av
