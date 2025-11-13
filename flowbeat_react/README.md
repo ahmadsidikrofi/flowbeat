@@ -91,6 +91,8 @@ cd android
 ./gradlew assembleDebug
 npx expo run:android
 hasil apk ada di android/app/build/outputs/apk/debug/app-debug.apk
+adb install android/app/build/outputs/apk/debug/app-debug.apk
+
 
 klo eror di ./gradlew assembleDebug, buka path C:\Users\testl\Documents\TelU\Pascasarjana\Tesis\References\Jurnal Arsitektur Omron\code jurnal jeemi\flowbeat_code\flowbeat\flowbeat_react\android di android studio
 pilih menu Build → Build Bundle(s) / APK(s) → Build APK(s)
