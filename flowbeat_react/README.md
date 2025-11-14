@@ -89,7 +89,7 @@ import { useAudioPlayer } from 'expo-audio';
 deploy non eas expo
 npx expo prebuild
 cd android
-./gradlew assembleDebug
+./gradlew assembleDebug (kalau eror pindah folder agar path tidak teralalu panjang)
 npx expo run:android
 hasil apk ada di android/app/build/outputs/apk/debug/app-debug.apk
 adb install android/app/build/outputs/apk/debug/app-debug.apk
