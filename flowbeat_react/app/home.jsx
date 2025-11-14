@@ -10,7 +10,8 @@ import { useRouter } from 'expo-router';
 import ProtectedRoute from '../components/ProtectedRoute';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Vibration } from 'react-native';
-import { Audio } from 'expo-av';
+// import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { EXPO_PUBLIC_API_URL } from '@env';
 
 const API_URL = EXPO_PUBLIC_API_URL;
@@ -20,6 +21,7 @@ export default function Home() {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showWarning, setShowWarning] = useState(false);
+    const player = useAudioPlayer(require('../assets/sounds/Nokia.mp3'));
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -57,6 +59,28 @@ export default function Home() {
 
         fetchUserData();
     }, []);
+
+        // ✅ Cleanup audio saat unmount
+    useEffect(() => {
+        return () => {
+            player.remove();
+        };
+    }, []);
+
+    // ✅ Function trigger alert dengan expo-audio
+    const triggerAlert = (type) => {
+        // Getar 2 kali
+        Vibration.vibrate([500, 500, 500]);
+
+        // Mainkan suara alarm
+        try {
+            player.play();
+        } catch (error) {
+            console.error('Error playing sound:', error);
+        }
+
+        // console.log(`${type} - notifikasi dipicu`);
+    };
 
     if (loading) {
         return (
@@ -96,18 +120,6 @@ export default function Home() {
             ? 'Tidak Normal'
             : 'Normal';
 
-    async function triggerAlert(type) {
-        // Getar 2 kali
-        Vibration.vibrate([500, 500, 500]);
-
-        // Mainkan suara alarm singkat
-        const { sound } = await Audio.Sound.createAsync(
-            require('../assets/sounds/Nokia.mp3') // pastikan file ini ada
-        );
-        await sound.playAsync();
-
-        // console.log(`${type} - notifikasi dipicu`);
-    }
 
 
 

@@ -37,14 +37,16 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font",  
+      "expo-font",
       [
         "expo-image-picker",
         {
           "photosPermission": "Aplikasi memerlukan akses ke galeri untuk memilih foto profil.",
           "cameraPermission": "Aplikasi memerlukan akses ke kamera untuk mengambil foto profil."
         }
-      ]
+      ],
+      "expo-audio",
+      "expo-video"
     ],
     "extra": {
       "router": {},

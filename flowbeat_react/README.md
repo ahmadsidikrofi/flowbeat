@@ -82,8 +82,9 @@ Edit app.json:
 untuk show diagram
 npm install react-native-chart-kit react-native-svg
 
-untuk dering dna getar
-npx expo install expo-av
+untuk dering & getar
+npx expo install expo-av ganti dengan npx expo install expo-audio & npx expo install expo-video
+import { useAudioPlayer } from 'expo-audio';
 
 deploy non eas expo
 npx expo prebuild
@@ -97,3 +98,6 @@ adb install android/app/build/outputs/apk/debug/app-debug.apk
 klo eror di ./gradlew assembleDebug, buka path C:\Users\testl\Documents\TelU\Pascasarjana\Tesis\References\Jurnal Arsitektur Omron\code jurnal jeemi\flowbeat_code\flowbeat\flowbeat_react\android di android studio
 pilih menu Build → Build Bundle(s) / APK(s) → Build APK(s)
 android/app/build/outputs/apk/debug/app-debug.apk
+
+setelah git clone
+npm install expo
