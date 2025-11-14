@@ -60,12 +60,6 @@ export default function Home() {
         fetchUserData();
     }, []);
 
-        // ✅ Cleanup audio saat unmount
-    useEffect(() => {
-        return () => {
-            player.remove();
-        };
-    }, []);
 
     // ✅ Function trigger alert dengan expo-audio
     const triggerAlert = (type) => {
@@ -119,9 +113,6 @@ export default function Home() {
             : spo2 < 90
             ? 'Tidak Normal'
             : 'Normal';
-
-
-
 
     return (
         <ProtectedRoute>
