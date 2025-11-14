@@ -101,3 +101,6 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 setelah git clone
 npm install expo
+
+git pull branch pribadi
+git clone -b alaric --single-branch link repo
