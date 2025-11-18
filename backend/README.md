@@ -144,3 +144,5 @@ const fs = require('fs');
 
 run ngrok
 npx ngrok http 4000
+
+setelah deploy pindah ke https://github.com/alaric2001/flowbeatbe-deploy.git
