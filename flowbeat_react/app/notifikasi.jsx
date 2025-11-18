@@ -60,7 +60,7 @@ export default function Notifikasi() {
             minute: '2-digit',
         });
 
-        return `${tanggal} pukul ${waktu}`;
+        return `${tanggal}, ${waktu}`;
         };
 
     return (
