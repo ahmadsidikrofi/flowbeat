@@ -14,7 +14,7 @@ class OmronTransmissionRule implements CDLTransmissionRuleInterface
         $intervals = [
             'Rendah' => 10,
             'Hipertensi Tinggi' => 10,
-        'Normal Tinggi' => 20,
+            'Normal Tinggi' => 20,
             'Normal' => 30,
         ];
         return $intervals;

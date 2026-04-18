@@ -11,8 +11,8 @@ class PatientSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
-    {
-        PatientModel::factory(500)->create();
-    }
+    // public function run(): void
+    // {
+    //     PatientModel::factory(500)->create();
+    // }
 }

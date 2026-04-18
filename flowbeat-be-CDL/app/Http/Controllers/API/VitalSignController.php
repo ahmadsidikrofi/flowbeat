@@ -52,9 +52,19 @@ class VitalSignController extends Controller
         ];
 
         if (!$isBpmAllowed || !$isSpo2Allowed) { // jika salah satu metrik kena delay, maka seluruh paket di buffer
-            $bufferStatus = (str_contains($bpm_status, 'Normal') || str_contains($spo2_status, 'Normal')) ? 'VITAL_NORMAL' : 'VITAL_TIDAK_NORMAL';
-            $generic_cdl = new CDLService($bpmRule); // Pakai rule apa saja, hanya untuk panggil bufferData
-            $generic_cdl->bufferDataWithStatus($bufferStatus, $dbData);
+            // Tentukan buffer status berdasarkan prioritas: status yang lebih kritis memiliki prioritas lebih tinggi
+            // Prioritas: Tidak Normal (Hipoksia) > Tidak Normal (BPM) > Waspada > Normal
+            $bufferStatus = 'VITAL_NORMAL'; // default
+            if (str_contains($spo2_status, 'Tidak Normal') || str_contains($bpm_status, 'Tidak Normal')) {
+                $bufferStatus = 'VITAL_TIDAK_NORMAL';
+            } elseif (str_contains($spo2_status, 'Waspada')) {
+                $bufferStatus = 'VITAL_WASPADA';
+            }
+
+            // Gunakan SpO2Rule karena VitalSignModel digunakan untuk kedua metrik
+            $vitalSignRule = new SpO2TransmissionRule();
+            $cdlForVitalSign = new CDLService($vitalSignRule);
+            $cdlForVitalSign->bufferDataWithStatus($bufferStatus, $dbData);
 
             $currentBuffer = Cache::get("cdl_buffer_{$bufferStatus}", []);
 
@@ -62,7 +72,9 @@ class VitalSignController extends Controller
                 'message' => 'Vital sign data buffered',
                 'bpm_status' => $bpm_status,
                 'spo2_status' => $spo2_status,
-                'cache_ttl' => $currentBuffer,
+                'buffer_status' => $bufferStatus,
+                'buffer_count' => count($currentBuffer),
+                'current_buffer' => $currentBuffer,
             ], 202);
         }
 

@@ -62,14 +62,24 @@ class PatientController extends Controller
     public function RecentPatients()
     {
         Carbon::setLocale('id');
+
+        // Gunakan subquery untuk mendapatkan patient_id dengan measurement terbaru
         $recentPatients = PatientModel::select('patients.*')
-            ->join('blood_pressure_measurements', 'patients.id', '=', 'blood_pressure_measurements.patient_id')
-            ->groupBy('patients.id')
-            ->orderByRaw('MAX(blood_pressure_measurements.created_at) DESC') // Urutkan berdasarkan tanggal terbaru dari blood_pressure_measurements
-            ->with(['healthData' => function ($query) { // Ambil relasi healthData terbaru untuk di-map
-                $query->latest();
+            ->joinSub(
+                DB::table('blood_pressure_measurements')
+                    ->select('patient_id', DB::raw('MAX(created_at) as latest_measurement'))
+                    ->groupBy('patient_id')
+                    ->orderBy('latest_measurement', 'DESC')
+                    ->limit(10),
+                'latest_measurements',
+                'patients.id',
+                '=',
+                'latest_measurements.patient_id'
+            )
+            ->orderBy('latest_measurements.latest_measurement', 'DESC')
+            ->with(['healthData' => function ($query) {
+                $query->latest()->limit(1);
             }])
-            ->take(10)
             ->get()
             ->map(function ($patient) {
                 return [

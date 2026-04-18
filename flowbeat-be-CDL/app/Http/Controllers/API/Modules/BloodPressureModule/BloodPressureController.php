@@ -18,58 +18,17 @@ use Illuminate\Support\Facades\Log;
 
 class BloodPressureController extends Controller
 {
-    // public function StoreBloodPressure( Request $request, $uuid)
-    // {
-    //     $patient = PatientModel::where('uuid', $uuid)->first();
-    //     if ($patient && Auth::check()) {
-    //         $sys = $request->input('sys');
-    //         $dia = $request->input('dia');
-    //         $bpm = $request->input('bpm');
-    //         $mov = $request->input('mov');
-    //         $ihb = $request->input('ihb');
-    //         $device = $request->input('device');
-
-    //         if ($sys < 90 || $dia < 60) {
-    //             $status = "Rendah";
-    //         } else if ($sys <= 120 && $dia <= 80) {
-    //             $status = "Normal";
-    //         } else if (($sys > 120 && $sys < 140) || ($dia > 80 && $dia < 90)) {
-    //             $status = "Normal Tinggi";
-    //         } else {
-    //             $status = "Hipertensi Tinggi";
-    //         }
-
-    //         $patient->healthData()->create([
-    //             'sys' => $sys,
-    //             'dia' => $dia,
-    //             'bpm' => $bpm,
-    //             'mov' => $mov,
-    //             'ihb' => $ihb,
-    //             'device' => $device,
-    //             'status' => $status,
-    //             'patient_id' => $patient->id,
-    //         ]);
-    //         Cache::forget("bp_data_{$patient->id}");
-    //         return response()->json([
-    //             'message' => 'Health data successfully stored',
-    //             'patient_name' => $patient->first_name . " " . $patient->last_name,
-    //             'uuid' => $patient->uuid,
-    //             'sys' => $sys,
-    //             'dia' => $dia,
-    //             'device' => $device,
-    //             'status' => $status
-    //         ], 201);
-    //     }
-    //     return response()->json(['message' => 'Patient is not authenticate or not found'], 401);
-    // }
-
     public function StoreBloodPressure( Request $request, $id )
     {
         $rule = new OmronTransmissionRule();
         $cdl = new CDLService($rule);
         $status = $rule->calculateStatus($request->all());
-        // $status = $cdl->calculateStatus($request->sys, $request->dia);
         $patient = PatientModel::where('id', $id)->first();
+
+        if (!$patient || !Auth::check()) {
+            return response()->json(['message' => 'Patient is not authenticated or not found'], 401);
+        }
+
         $requestData = [
             'patient_id' => $id,
             'sys' => $request->sys,
@@ -82,12 +41,16 @@ class BloodPressureController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ];
+
+        // CDL: Cek apakah data boleh dikirim berdasarkan rate limiting fleksibel
         if (!$cdl->isAllowedToSend($id, $requestData)) {
             $cdl->bufferData($requestData);
+            $currentBuffer = Cache::get("cdl_buffer_{$status}", []);
             return response()->json([
                 'message' => 'Health Data Saved & Buffered',
                 'status' => $status,
-                'cache_ttl' => Cache::get("cdl_buffer_{$status}"),
+                'buffer_count' => count($currentBuffer),
+                'current_buffer' => $currentBuffer
             ], 202);
         }
 
