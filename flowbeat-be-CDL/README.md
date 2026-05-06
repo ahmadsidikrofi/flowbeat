@@ -1,6 +1,10 @@
 # [FlowBeat]
 
-Project ini digunakan untuk memenuhi pelaksanaan dari Tugas Akhir pembuatan Dashboard Monitoring Pasien Berpenyakit Jantung
+Proyek ini dikembangkan sebagai bagian dari pelaksanaan Tugas Akhir yang berfokus pada pembuatan Dashboard Monitoring untuk pasien berpenyakit jantung. Sistem ini memungkinkan tenaga medis untuk memantau data kesehatan pasien secara terpusat melalui dashboard berbasis web.
+
+Salah satu komponen utama dalam proyek ini adalah penerapan Control Delay Layer (CDL), yaitu sebuah lapisan tambahan dalam arsitektur sistem yang berfungsi untuk mengatur interval pengiriman data dari perangkat ke server. Dalam skenario Remote Patient Monitoring (RPM), data sensor cenderung dikirim secara terus-menerus dalam frekuensi tinggi, yang berpotensi menyebabkan overload pada server dan menurunkan performa sistem.
+
+CDL hadir sebagai mekanisme kontrol yang memungkinkan pengaturan jeda (delay) dalam proses transmisi data. Dengan pendekatan ini, sistem tidak hanya mampu mengurangi lonjakan request ke server, tetapi juga menjaga kestabilan performa serta efisiensi pengelolaan data. Selain itu, CDL dirancang agar fleksibel, sehingga interval pengiriman data dapat disesuaikan berdasarkan kebutuhan monitoring, baik secara real-time maupun berkala.
 
 > **Warning**
 > This project is still in development and is not ready for production use.
