@@ -7,10 +7,9 @@ import QuickSearch from "./QuickSearch";
 import ChartBarItem from "./BarChartItem"
 import RecentPatientsTable from "./RecentPatientTable";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import DistributionBloodPressureChart from "./DistributionBloodPressureChart"
 import { useAuth } from "@clerk/nextjs";
-import apiClient, { setupAuthInterceptor } from "@/lib/api-client";
+import { mobileApiService, setupMobileAuthInterceptor } from "@/lib/mobile-api-service";
 
 const DashboardContainer = () => {
     const [ patientCount, setPatientCount ] = useState(0)
@@ -22,28 +21,48 @@ const DashboardContainer = () => {
     const [ distributionByStatus, setDistributionByStatus ] = useState([])
     const [ isDataMounted, setIsDataMounted ] = useState(true)
     const { getToken } = useAuth()
+
     useEffect(() => {
         setTimeout(() => {setIsDataMounted(false)}, 1500)
-        CountPatient()
-        setupAuthInterceptor(getToken)
+        setupMobileAuthInterceptor(getToken)
+        fetchDashboardData()
     }, [getToken])
 
-    const CountPatient = async () => {
-        const [patientsRes, statusRes, recentRes, distributionRes] = await Promise.all([
-            apiClient.get('/patients'),
-            apiClient.get('/patients/summary/status'),
-            apiClient.get('/patients/recent'),
-            apiClient.get('/patients/statistics/distribution')
-        ]);
+    const fetchDashboardData = async () => {
+        try {
+            // Step 1: Ambil id_user dari endpoint /api/doctor (mapping Clerk → FastAPI)
+            const doctorProfile = await mobileApiService.getDoctorProfile()
+            const idUser = doctorProfile?.id_user
 
-        setPatientCount(statusRes.data.total_patient)
-        setNormalPatient(statusRes.data.normal_patient)
-        setRiskPatient(statusRes.data.hyper_patient)
-        setCheckedToday(statusRes.data.checked_today)
-        setNotCheckedToday(statusRes.data.not_checked_today)
-        setRecentPatients(recentRes.data.recent_patients)
-        setDistributionByStatus(distributionRes.data.data)
+            if (!idUser) {
+                console.warn('[Dashboard] id_user tidak tersedia — /api/doctor belum aktif')
+                return
+            }
+
+            // Step 2: Ambil semua pasien + latest vitals sekaligus (parallel per pasien)
+            const patients = await mobileApiService.getPatientsWithLatestVitals(idUser)
+
+            // Step 3: Hitung statistik lokal (menggantikan /patients/summary/status)
+            const stats = mobileApiService.computeStats(patients)
+            setPatientCount(stats.total_patient)
+            setNormalPatient(stats.normal_patient)
+            setRiskPatient(stats.hyper_patient)
+            setCheckedToday(stats.checked_today)
+            setNotCheckedToday(stats.not_checked_today)
+
+            // Step 4: Recent patients — urutkan berdasarkan lastVisit terbaru, ambil 5
+            const sorted = [...patients]
+                .filter(p => p.lastVisit !== null)
+                .sort((a, b) => new Date(b.lastVisit) - new Date(a.lastVisit))
+                .slice(0, 5)
+            setRecentPatients(sorted)
+
+        } catch (err) {
+            console.error('[Dashboard] fetchDashboardData error:', err)
+        }
     }
+
+
     return (
         <main className="pr-4 py-2 h-full flex flex-col">
             <Header

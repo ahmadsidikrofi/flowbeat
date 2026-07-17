@@ -11,13 +11,10 @@ export const createEchoInstance = (auth) => {
     }
 
     const options = {
-        broadcaster: 'reverb',
-        key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
-        wsHost: process.env.NEXT_PUBLIC_REVERB_HOST,
-        wsPort: process.env.NEXT_PUBLIC_REVERB_PORT,
-        wssPort: process.env.NEXT_PUBLIC_REVERB_PORT,
-        forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https',
-        enabledTransports: ['ws', 'wss'],
+        broadcaster: 'pusher',
+        key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
+        cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER,
+        forceTLS: true,
         authEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}/broadcasting/auth`,
         auth: {
             headers: {

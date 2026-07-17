@@ -26,31 +26,19 @@ const ProfileDataPatient = ({ patient, lastVisit, isDataMounted, patientHealthDa
                 <CardContent className="space-y-4">
                     <div>
                         <p className="text-sm font-medium">Nama</p>
-                        <p>{patient?.first_name || '--'} {patient?.last_name || '--'}</p>
+                        <p>{patient?.name || '--'}</p>
                     </div>
                     <div>
                         <p className="text-sm font-medium">Usia</p>
                         <p>{patient?.age || '--'} tahun</p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium">Tanggal Lahir</p>
-                        <p>{patient?.date_of_birth || '--'}</p>
-                    </div>
-                    <div>
                         <p className="text-sm font-medium">Jenis Kelamin</p>
                         <p>{patient?.gender || '--'}</p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium">Nomor Telepon</p>
-                        <p>{patient?.phone_number || '--'}</p>
-                    </div>
-                    <div>
-                        <p className="text-sm font-medium">Alamat</p>
-                        <p>{patient?.address || '--'}</p>
-                    </div>
-                    <div>
                         <p className="text-sm font-medium">Tekanan Darah Terakhir</p>
-                        <p>{patient?.health_data?.[0]?.sys || '--'} / {patient?.health_data?.[0]?.dia || '--'}</p>
+                        <p>{patientHealthData.data?.[0]?.sys !== undefined ? `${patientHealthData.data[0].sys} / ${patientHealthData.data[0].dia}` : '--'}</p>
                     </div>
                     <div>
                         <p className="text-sm font-medium">Status</p>
@@ -60,15 +48,15 @@ const ProfileDataPatient = ({ patient, lastVisit, isDataMounted, patientHealthDa
                     </div>
                     <div>
                         <p className="text-sm font-medium">Terakhir Diperiksa</p>
-                        <p>{lastVisit || '--'}</p>
+                        <p>{lastVisit ? new Date(lastVisit).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }) : '--'}</p>
                     </div>
                     <div>
                         <p className="text-sm font-medium">Tinggi Badan</p>
-                        <p>{patient?.height || '--'}</p>
+                        <p>{patient?.tb ? `${patient.tb} cm` : '--'}</p>
                     </div>
                     <div>
                         <p className="text-sm font-medium">Berat Badan</p>
-                        <p>{patient?.weight || '--'}</p>
+                        <p>{patient?.bb ? `${patient.bb} kg` : '--'}</p>
                     </div>
                 </CardContent>
             )}

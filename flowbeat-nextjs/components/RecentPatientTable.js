@@ -43,12 +43,12 @@ const RecentPatientsTable = ({ recentPatients }) => {
             <TableBody>
               {recentPatients.map((patient) => (
                 <TableRow key={patient.id} className="p-12">
-                  <TableCell className="">{patient.first_name}</TableCell>
+                  <TableCell className="">{patient.name ?? '—'}</TableCell>
                   <TableCell className="">{patient.lastBP}</TableCell>
                   <TableCell>
                     <Badge className={`${getStatusColor(patient.status)} rounded-full text-nowrap`}>{patient.status}</Badge>
                   </TableCell>
-                  <TableCell className="text-right">{patient.lastVisit}</TableCell>
+                  <TableCell className="text-right">{patient.lastVisit ? new Date(patient.lastVisit).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

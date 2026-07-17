@@ -39,12 +39,21 @@ const PatientNotes = ({ patientUUID }) => {
     const [refreshData, setRefreshData] = useState(false)
 
     const GetNotesFromDB = async () => {
-       const res = await apiClient.get(`/patients/${patientUUID}/notes`)
-       setNotes(res.data.data)
+        try {
+            const res = await apiClient.get(`/patients/${patientUUID}/notes`)
+            if (res.data?.success) {
+                setNotes(res.data.data ?? [])
+            } else {
+                setNotes([])
+            }
+        } catch (error) {
+            console.error('[PatientNotes] Error fetching notes:', error)
+            setNotes([])
+        }
     }
     useEffect(() => {
         GetNotesFromDB()
-    }, [refreshData])
+    }, [refreshData, patientUUID])
 
     const handleOpenDialog = (note) => {
         if (note) {

@@ -21,52 +21,68 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import TableSkeleton from "./Skeleton/TableSkeleton";
-import apiClient from "@/lib/api-client";
+import { mobileApiService, setupMobileAuthInterceptor } from "@/lib/mobile-api-service";
+import { useAuth } from "@clerk/nextjs";
+
+const PAGE_SIZE = 10
 
 const PatientList = () => {
   const [ isTableMounted, setIsTableMounted ] = useState(true)
-  const [patients, setPatients] = useState([])
+  const [allPatients, setAllPatients] = useState([])
   const [sortColumn, setSortColumn] = useState("")
   const [sortDirection, setSortDirection] = useState("asc")
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
   const router = useRouter()
+  const { getToken } = useAuth()
 
   useEffect(() => {
+    setupMobileAuthInterceptor(getToken)
     const fetchPatients = async () => {
       try {
-        const response = await apiClient(`/patients?page=${currentPage}`)
-        const data = await response.data
-        if (data.success) {
-          setPatients(data.patients.data)
-          setTotalPages(data.patients.last_page)
-          setIsTableMounted(true)
-          setTimeout(() => {
-              setIsTableMounted(false)
-          }, 1000)
+        // Step 1: Ambil id_user dari /api/doctor
+        const doctorProfile = await mobileApiService.getDoctorProfile()
+        const idUser = doctorProfile?.id_user
+        if (!idUser) {
+          console.warn('[PatientList] id_user tidak tersedia — /api/doctor belum aktif')
+          setIsTableMounted(false)
+          return
         }
+
+        // Step 2: Ambil semua pasien + latest vitals
+        const patients = await mobileApiService.getPatientsWithLatestVitals(idUser)
+        console.log('[PatientList] patients from FastAPI:', patients)
+        setAllPatients(patients)
+        setIsTableMounted(true)
+        setTimeout(() => { setIsTableMounted(false) }, 1000)
       } catch (error) {
-        console.error("Error fetching patients:", error)
+        console.error('[PatientList] Error fetching patients:', error)
+        setIsTableMounted(false)
       }
     }
     fetchPatients()
-  }, [currentPage])
+  }, [getToken])
 
-  const sortedPatients = [...patients]
+  // Filter + sort (client-side, karena FastAPI tidak support server-side)
+  const filteredPatients = allPatients
+    .filter((patient) =>
+      (patient.name ?? "").toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .sort((a, b) => {
       if (sortColumn === "name") {
-        return sortDirection === "asc" ? a.first_name.localeCompare(b.first_name) : b.first_name.localeCompare(a.first_name)
+        return sortDirection === "asc"
+          ? (a.name ?? "").localeCompare(b.name ?? "")
+          : (b.name ?? "").localeCompare(a.name ?? "")
       }
       if (sortColumn === "age") {
-        return sortDirection === "asc" ? a.age - b.age : b.age - a.age
+        return sortDirection === "asc" ? (a.age ?? 0) - (b.age ?? 0) : (b.age ?? 0) - (a.age ?? 0)
       }
       return 0
     })
-    .filter((patient) =>
-      patient.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.last_name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+
+  // Paginasi client-side
+  const totalPages = Math.max(1, Math.ceil(filteredPatients.length / PAGE_SIZE))
+  const sortedPatients = filteredPatients.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   const handleSort = (column) => {
     setSortColumn(column);
@@ -137,53 +153,51 @@ const PatientList = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedPatients.map((patient) => {
-                const lastBP = patient.health_data.length > 0
-                  ? `${patient.health_data[0].sys}/${patient.health_data[0].dia}`
-                  : "N/A";
-                const status = patient.health_data.length > 0 ? patient.health_data[0].status : "Tidak ada data"
-
-                return (
-                  <TableRow key={patient.id}>
-                    <TableCell className="font-medium">...{patient.uuid.slice(-5)}</TableCell>
-                      <TableCell>
-                        <Button variant="link" className="p-0" onClick={() => router.push(`/patients/${patient.uuid}`)}>
-                          {`${patient.first_name} ${patient.last_name || ""}`}
+              {sortedPatients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell className="font-medium">PT-{String(patient.id).padStart(5, '0')}</TableCell>
+                  <TableCell>
+                    <Button variant="link" className="p-0" onClick={() => router.push(`/patients/${patient.id}`)}>
+                      {patient.name ?? '—'}
+                    </Button>
+                  </TableCell>
+                  <TableCell>{patient.age || "♾️"}</TableCell>
+                  <TableCell>{patient.lastBP}</TableCell>
+                  <TableCell>{patient.lastBPM}</TableCell>
+                  <TableCell>
+                    <Badge className={`${getStatusColor(patient.status)} text-white text-nowrap`}>
+                      {patient.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {patient.lastVisit
+                      ? dayjs(patient.lastVisit).fromNow()
+                      : 'Belum ada data'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
-                      </TableCell>
-                    <TableCell>{patient.age || "♾️"}</TableCell>
-                    <TableCell>{lastBP}</TableCell>
-                    <TableCell>{lastBP}</TableCell>
-                    <TableCell>{lastBP}</TableCell>
-                    {/* <TableCell>
-                      <Badge className={`${getStatusColor(status)} text-white`}>{status}</Badge>
-                    </TableCell> */}
-                    <TableCell>{getLastCheckupTime(patient.health_data)}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Menu</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(patient.uuid.toString())}>
-                            Salin MRN Pasien
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <Button variant="link" asChild onClick={() => router.push(`/patients/${patient.uuid}`)}>
-                            <DropdownMenuItem>Detail pasien</DropdownMenuItem>
-                          </Button>
-                          <Button asChild>
-                            <DropdownMenuItem>Laporkan!</DropdownMenuItem>
-                          </Button>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(String(patient.id))}>
+                          Salin ID Pasien
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <Button variant="link" asChild onClick={() => router.push(`/patients/${patient.id}`)}>
+                          <DropdownMenuItem>Detail pasien</DropdownMenuItem>
+                        </Button>
+                        <Button asChild>
+                          <DropdownMenuItem>Laporkan!</DropdownMenuItem>
+                        </Button>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         )}

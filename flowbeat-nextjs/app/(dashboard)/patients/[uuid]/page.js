@@ -8,90 +8,92 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Edit, Pen } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useref } from "react";
-import apiClient from "@/lib/api-client";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createEchoInstance } from "@/lib/echo";
 import { useAuth } from "@clerk/nextjs";
+import { mobileApiService, setupMobileAuthInterceptor } from "@/lib/mobile-api-service";
 
 const DetailPatientPage = () => {
     const { uuid } = useParams()
-    const [ patient, setPatient ] = useState([])
-    const [ patientHealthData, setPatientHealthData ] = useState([])
-    const [ lastVisit, setLastVisit ] = useState('')
-    const [ bloodPressureData, setBloodPressureData ] = useState([])
-    const [ VitalSignData, setVitalSignData ] = useState([])
+    const profileId = parseInt(uuid)
+
+    const [ patient, setPatient ] = useState(null)
+    const [ measurements, setMeasurements ] = useState([])
     const [ currentPage, setCurrentPage ] = useState(1)
     const [ totalPages, setTotalPages ] = useState(1)
     const [ isDataMounted, setIsDataMounted ] = useState(true)
     const echoRef = useRef(null)
     const auth = useAuth()
 
-    const getDetailData = useCallback(async () => {
-            const res = await apiClient.get(`/patients/${uuid}?page=${currentPage}`)
-            setPatient(res.data?.patient_data)
-            setPatientHealthData(res.data?.health_data)
-            setLastVisit(res.data?.lastVisit)
-            setTotalPages(res.data?.health_data.last_page)
-    }, [uuid, currentPage]) 
+    const fetchPatientData = useCallback(async () => {
+        try {
+            setupMobileAuthInterceptor(auth.getToken)
 
-    const fetchBPData = useCallback(async () => {
-            if (!patient?.id) return
-            const res = await apiClient.get(`/patients/${patient.id}/blood-pressures`)
-            setBloodPressureData(res.data)
-    }, [patient?.id]) 
+            // Ambil semua measurements untuk profile ini
+            const measureData = await mobileApiService.getMeasurements(profileId)
+            setMeasurements(measureData)
+            setTotalPages(Math.max(1, Math.ceil(measureData.length / 5)))
 
-    const fetchVitalData = useCallback(
-        async () => {
-            if (!patient?.id) return
-            const res = await apiClient.get(`/patients/${patient.id}/vital-signs`)
-            setVitalSignData(res.data)
-    }, [patient?.id]) 
+            // Ambil profile info via id_user (dari /api/doctor)
+            const doctorProfile = await mobileApiService.getDoctorProfile()
+            if (doctorProfile?.id_user) {
+                const profiles = await mobileApiService.getProfiles(doctorProfile.id_user)
+                const found = profiles.find(p => p.id === profileId)
+                if (found) setPatient(found)
+            }
+        } catch (err) {
+            console.error('[DetailPatientPage] fetchPatientData error:', err)
+        }
+    }, [profileId, auth.getToken])
 
     useEffect(() => {
         setTimeout(() => {setIsDataMounted(false)}, 3000)
-        getDetailData()
-        if (patient?.id) {
-            fetchBPData()
-            fetchVitalData()
-        }
-    }, [patient?.id, currentPage, getDetailData])
+        fetchPatientData()
+    }, [fetchPatientData])
 
+    // WebSocket untuk real-time BP data
     useEffect(() => {
-        if (!patient?.id || ! auth.isLoaded) return 
+        if (!profileId || !auth.isLoaded) return
 
         const setupWebSocket = async () => {
             try {
-                const echo = createEchoInstance(auth);
-                echoRef.current = echo;
-                
-                console.log(`🚀 Terhubung dan mendengarkan di channel: patient.${patient.id}`);
-                echo.channel(`patient.${patient.id}`)
+                const echo = createEchoInstance(auth)
+                echoRef.current = echo
+
+                console.log(`🚀 Listening di channel: patient.${profileId}`)
+                echo.channel(`patient.${profileId}`)
                     .listen('.BloodPressureDataEvent', (data) => {
-                        console.log('✅ EVENT REAL-TIME DITERIMA!', data);
-                        fetchBPData();
-                    });
-
-
+                        console.log('✅ EVENT REAL-TIME DITERIMA!', data)
+                        fetchPatientData()
+                    })
             } catch (error) {
-                console.error('WebSocket setup error:', error);
+                console.error('WebSocket setup error:', error)
             }
-        };
-        setupWebSocket();
-        
+        }
+        setupWebSocket()
+
         return () => {
             if (echoRef.current) {
-                echoRef.current.leave(`patient.${patient.id}`);
+                echoRef.current.leave(`patient.${profileId}`)
             }
-        };
-        
-    }, [patient?.id, auth.isLoaded, auth, fetchBPData])
+        }
+    }, [profileId, auth.isLoaded, auth, fetchPatientData])
+
+    // Paginasi measurements (5 per halaman)
+    const PAGE_SIZE = 5
+    const paginatedMeasurements = {
+        data: measurements.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+        last_page: totalPages,
+    }
+
+    const latestMeasurement = measurements[0] ?? null
 
     return (
         <main className="pr-4 py-2 h-full flex flex-col">
             <Header
-                leftTitle={`Detail Pasien: ${patient.first_name}`}
+                leftTitle={`Detail Pasien: ${patient?.name ?? '...'}`}
                 rightTitle="Flowbeat"
-                description={`MRN: ${uuid}`} 
+                description={`ID: PT-${String(profileId).padStart(5, '0')}`}
                 icon={<Pen />}
             />
             <div className="flex justify-between items-center my-6">
@@ -108,20 +110,25 @@ const DetailPatientPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 py-4">
                 <div className="lg:col-span-1">
                     <div className="space-y-3">
-                        <ProfileDataPatient patientHealthData={patientHealthData} patient={patient} lastVisit={lastVisit} isDataMounted={isDataMounted}/>
-                        <PatientNotes patientUUID={uuid} />
+                        <ProfileDataPatient
+                            patientHealthData={paginatedMeasurements}
+                            patient={patient}
+                            lastVisit={latestMeasurement?.datetime ?? '—'}
+                            isDataMounted={isDataMounted}
+                        />
+                        <PatientNotes patientUUID={String(profileId)} />
                     </div>
                 </div>
                 <div className="lg:col-span-2">
-                    <MedicalHistory 
-                        currentPage={currentPage} 
-                        setCurrentPage={setCurrentPage} 
-                        totalPages={totalPages} 
-                        patientHealthData={patientHealthData} 
-                        bloodPressureData={bloodPressureData} 
-                        VitalSignData={VitalSignData} 
-                        setIsDataMounted={setIsDataMounted} 
-                        isDataMounted={isDataMounted} 
+                    <MedicalHistory
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        totalPages={totalPages}
+                        patientHealthData={paginatedMeasurements}
+                        bloodPressureData={measurements}
+                        VitalSignData={[]}
+                        setIsDataMounted={setIsDataMounted}
+                        isDataMounted={isDataMounted}
                     />
                 </div>
             </div>
