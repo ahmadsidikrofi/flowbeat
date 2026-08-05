@@ -4,6 +4,8 @@ namespace Tests\Feature;
  
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use App\Models\User;
  
 class IngestTest extends TestCase
 {
@@ -39,4 +41,10 @@ class IngestTest extends TestCase
         $res = $this->postJson('/api/v1/ingest', ['mac_address' => 'AA:BB:CC:DD:EE:FF']);
         $res->assertStatus(422);
     }
+
+    protected function setUp(): void
+{
+    parent::setUp();
+    Sanctum::actingAs(User::factory()->create());
+}
 }
