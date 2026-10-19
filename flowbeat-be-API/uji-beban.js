@@ -74,7 +74,7 @@ export const options = {
 };
 
 // Tempel token dari hasil login di sini, di antara tanda petik
-const TOKEN = 'TEMPEL_TOKEN_DARI_LOGIN_DI_SINI';
+const TOKEN = '1|UcPk0XuMwsxjwm7pbFL9VrCuRNNNkNPo0DO5qkeidc1933c4';
 
 export default function () {
   // waktu dibuat unik agar tiap kiriman tersimpan, bukan terdeteksi duplikat
@@ -99,4 +99,6 @@ export default function () {
   check(res, {
     'sukses 200 atau 201': (r) => r.status === 200 || r.status === 201,
   });
+  // tambahan sementara untuk melihat status yang muncul
+console.log('status: ' + res.status);
 }

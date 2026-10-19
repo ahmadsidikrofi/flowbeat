@@ -11,6 +11,8 @@ export const useLatestBloodPressure = () => {
     const [ localDataBP, setLocalDataBP ] = useState([])
     const [ latestBPFromDB, setLatestBPFromDB ] = useState('')
     const [ historyDataFromBP, setHistoryDataFromBP ] = useState([])
+    // 1. TAMBAHKAN STATE BARU UNTUK VITAL SIGN
+    const [ latestVitalSign, setLatestVitalSign ] = useState(null) // <-- TAMBAHKAN INI
     const [ isSuccess, setIsSuccess ] = useState(null)
     const { userToken, user } = useAuth()
     const baseURL = Config.BASE_URL
@@ -22,7 +24,7 @@ export const useLatestBloodPressure = () => {
             setRefreshing(true)
             setSyncData(true)
             console.log("Fetching blood pressure data...")
-            const res = await axios.post('http://10.58.95.249:8000/latest-bp-records', {
+            const res = await axios.post('http://192.168.131.249:8000/latest-bp-records', {
             
                 mac_address: 'FA:E4:FA:F7:F7:AC', // Masih setting manual
                 device_name: 'BLESmart_00000480FAE4FAF7F7AC', // Masih setting manual
@@ -37,12 +39,12 @@ export const useLatestBloodPressure = () => {
             const macAddress = res.data.mac_address
             const deviceName = res.data.device_name
 
-            setLocalDataBP({
-                datetime: latestRecords.datetime,
-                sys: latestRecords.sys,
-                dia: latestRecords.dia,
-                bpm: latestRecords.bpm
-            })
+            // setLocalDataBP({
+            //     datetime: latestRecords.datetime,
+            //     sys: latestRecords.sys,
+            //     dia: latestRecords.dia,
+            //     bpm: latestRecords.bpm
+            // })
             
             if (latestRecords) {
                 const getStoredDataBP = await AsyncStorage.getItem('blood-pressure-data')
@@ -110,7 +112,7 @@ export const useLatestBloodPressure = () => {
                 const res = await axios.get(
                     `${baseURL}/api/omron/${user.id}`,
                     { headers: { Authorization: `Bearer ${userToken}` } }
-                );
+                );  
                 const latestRecord = res?.data?.data?.[0] ?? null
                 setLatestBPFromDB(latestRecord)
             } catch (error) {
@@ -120,15 +122,45 @@ export const useLatestBloodPressure = () => {
     }
         
     const GetAllDataFromDB = async () => {
-        // if (userToken) {
-        //     const res = await axios.get(`${baseURL}/api/patients/blood-pressures`,
-        //         { headers: { Authorization: `Bearer ${userToken}` } }
-        //     )
-        //     // console.log("Response API", res.data);
-        //     setHistoryDataFromDB(prevDatas => {
-        //         return res.data['health_data'] || []
-        //     })
-        // }
+        if (userToken) {
+            try {
+            const res = await axios.get(`${baseURL}/api/omron/${user.id}`,
+                { headers: { Authorization: `Bearer ${userToken}` } }
+            );
+            console.log("Response API", res.data);
+            // setHistoryDataFromDB(prevDatas => {
+            //     return res.data['health_data'] || []
+            // })
+            if (res.data && Array.isArray(res.data.data)) {
+                 setHistoryDataFromBP(res.data.data); // <-- Update state di sini
+                 }
+            } catch (error) {
+                console.error('Gagal mengambil history data:', error);
+                setHistoryDataFromBP([]); // Set ke kosong jika gagal
+            }
+        }
+    }
+
+    // 2. TAMBAHKAN FUNGSI BARU UNTUK MENGAMBIL DATA VITAL SIGN
+    const GetLatestVitalSignFromDB = async () => {
+        if (userToken) {
+            try {
+                // Gunakan endpoint BARU yang Anda berikan
+                // Saya asumsikan '1' adalah user ID, jadi saya ganti dengan 'user.id'
+                const res = await axios.get(
+                    `${baseURL}/api/sensormax/${user.id}`, 
+                    { headers: { Authorization: `Bearer ${userToken}` } }
+                );
+                
+                // Berdasarkan respons JSON Anda, datanya ada di 'res.data.data'
+                if (res.data && res.data.data) {
+                    setLatestVitalSign(res.data.data); // <-- Simpan data ke state
+                }
+            } catch (error) {
+                console.error('Gagal mengambil vital sign:', error);
+                setLatestVitalSign(null); // Set ke null jika gagal
+            }
+        }
     }
 
     useEffect(() => {
@@ -136,6 +168,13 @@ export const useLatestBloodPressure = () => {
         if (userToken) {
             LatestDataBloodPressureFromDB()
             GetAllDataFromDB()
+            // 3. PANGGIL FUNGSI BARU SAAT USER LOGIN
+            GetLatestVitalSignFromDB() // <-- TAMBAHKAN INI
+        } else {
+            // [PENTING] Set data history ke kosong saat logout
+            setHistoryDataFromBP([]);
+            // 4. RESET STATE SAAT LOGOUT
+            setLatestVitalSign(null); // <-- TAMBAHKAN INI
         }
     }, [userToken])
 
@@ -147,6 +186,8 @@ export const useLatestBloodPressure = () => {
     localDataBP,
     latestBPFromDB, // Ini akan selalu kosong
     historyDataFromBP, // Ini akan selalu kosong
+    // 5. KIRIMKAN STATE BARU KE KOMPONEN LAYAR
+    latestVitalSign, // <-- TAMBAHKAN INI
     getBloodPressure,
     LatestDataBloodPressureFromDB // Ini tidak melakukan apa-apa
  };

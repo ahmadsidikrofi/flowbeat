@@ -12,8 +12,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Pasang header keamanan pada semua permintaan API
+        $middleware->api(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\RequestLogger::class,
+        ]);
+
+        // Daftarkan alias middleware
+        $middleware->alias([
+            'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
+            'abilities'        => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability'          => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+        ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

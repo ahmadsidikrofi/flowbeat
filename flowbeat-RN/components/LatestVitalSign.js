@@ -33,7 +33,7 @@ const LatestVitalSigns = () => {
     const [ latestVitalSign, setLatestVitalSign ] = useState('')
     const LatestVitalSignFromDB = async () => {
         if (userToken) {
-            const res = await axios.get(`${baseURL}/api/patients/vital-signs/latest`, {
+            const res = await axios.get(`${baseURL}/api/sensormax/1`, {
                 headers: { Authorization: `Bearer ${userToken}` }
             })
             setLatestVitalSign(res.data[0])
@@ -55,12 +55,12 @@ const LatestVitalSigns = () => {
             <View style={{ flexDirection: "row", gap: 12, marginVertical: 16 }}>
                 <VitalSignCard
                     title="Denyut Nadi"
-                    value={latestVitalSign?.bpm || "--"}
-                    unit="bpm"
+                    value={latestVitalSign?.hr || "--"}
+                    unit="HR"
                     isNormal={latestVitalSign?.bpm_status || "--"}
                     icon="heart-outline"
                 />
-                <VitalSignCard title="Oksigen" value={latestVitalSign?.spo2 || "--"} unit="%" isNormal={latestVitalSign?.spo2_status || "--"} icon="water-outline" />
+                <VitalSignCard title="Oksigen" value={latestVitalSign?.SpO2 || "--"} unit="%" isNormal={latestVitalSign?.spo2_status || "--"} icon="water-outline" />
             </View>
         </View>
     )

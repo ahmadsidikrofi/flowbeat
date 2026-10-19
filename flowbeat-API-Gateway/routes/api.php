@@ -28,11 +28,11 @@ Route::get('/sensormax/{id}', [DeviceController::class, 'GetMax30100DataByUserId
 
 
 
-Route::post('/vital-sign', [DeviceController::class, 'StoreMax30100Data']);
-Route::get('/vital-sign', [DeviceController::class, 'GetMax30100DataByUserId']);
+Route::post('/vital-sign/{id}', [DeviceController::class, 'StoreMax30100Data']);
+Route::get('/vital-sign/{id}', [DeviceController::class, 'GetMax30100DataByUserId']);
 
-Route::post('/lists', [DeviceController::class, 'StoreListData']);
-Route::get('/lists', [DeviceController::class, 'GetListData']);
-Route::delete('/lists/{id}', [DeviceController::class, 'DeleteListData']);
-Route::put('/lists/{id}', [DeviceController::class, 'UpdateListData']);
-Route::get('/lists/{id}', [DeviceController::class, 'GetListDataById']);
+// Route::post('/lists', [DeviceController::class, 'StoreListData']);
+// Route::get('/lists', [DeviceController::class, 'GetListData']);
+// Route::delete('/lists/{id}', [DeviceController::class, 'DeleteListData']);
+// Route::put('/lists/{id}', [DeviceController::class, 'UpdateListData']);
+// Route::get('/lists/{id}', [DeviceController::class, 'GetListDataById']);

@@ -7,7 +7,7 @@ import LatestVitalSign from "@/components/LatestVitalSign"
 import EmergencyCall from "@/components/EmergencyCall"
 
 export default function HomeScreen() {
-  const { refreshing, syncData, isSuccess, latestBP, localDataBP, latestBPFromDB, historyDataFromBP, getBloodPressure } = useLatestBloodPressure()
+  const { refreshing, syncData, isSuccess, latestBP, localDataBP, latestBPFromDB, historyDataFromBP, getBloodPressure, latestVitalSign } = useLatestBloodPressure()
 
   return (
     <ScrollView style={{ backgroundColor: '#fff' }}

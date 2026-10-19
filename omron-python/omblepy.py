@@ -316,7 +316,7 @@ async def selectBLEdevices():
 async def scanBLEDevices():
     """Scan perangkat BLE tanpa input interaktif."""
     from bleak import BleakScanner
-    devices = await BleakScanner.discover()
+    devices = await BleakScanner.discover(timeout=20)
     return [
         # {"id": idx, "mac": dev.address, "name": dev.name or "Unknown", "rssi": dev.rssi}
         {"id": idx, "mac": dev.address, "name": dev.name or "Unknown", "rssi": getattr(dev, 'rssi', None)}

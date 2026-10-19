@@ -7,6 +7,7 @@ use App\Adapters\AdapterRegistry;
 use App\Services\DataQualityService;
 use App\Models\PatientRecord;
 use App\Models\AnomalyLog;
+use App\Http\Requests\IngestRequest;
  
 class ApiAdapterController extends Controller
 {

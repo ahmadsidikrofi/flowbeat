@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+
  
 class IngestTest extends TestCase
 {
@@ -45,6 +46,6 @@ class IngestTest extends TestCase
     protected function setUp(): void
 {
     parent::setUp();
-    Sanctum::actingAs(User::factory()->create());
+    Sanctum::actingAs(User::factory()->create(), ['ingest:write']);
 }
 }
