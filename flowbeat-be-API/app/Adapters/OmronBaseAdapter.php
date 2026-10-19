@@ -27,19 +27,29 @@ abstract class OmronBaseAdapter implements VitalSignAdapter
     {
         $hasil = [];
  
-        // Bentuk 1, larik bersarang dari endpoint connect-and-read
+        // Bentuk 1, records dari endpoint connect-and-read.
+        // Menerima larik bersarang per bank pengguna, [[{...},{...}]],
+        // maupun larik datar langsung dari bridge versi terbaru, [{...},{...}].
         if (isset($payload['records']) && is_array($payload['records'])) {
-            foreach ($payload['records'] as $kelompokPengguna) {
-                if (!is_array($kelompokPengguna)) {
+            foreach ($payload['records'] as $item) {
+                if (!is_array($item)) {
                     continue;
                 }
-                foreach ($kelompokPengguna as $r) {
-                    $hasil[] = $this->keKanonis($r);
+                if (isset($item['sys'])) {
+                    // bentuk datar, item adalah satu catatan
+                    $hasil[] = $this->keKanonis($item);
+                    continue;
+                }
+                // bentuk bersarang, item adalah kelompok catatan
+                foreach ($item as $r) {
+                    if (is_array($r) && isset($r['sys'])) {
+                        $hasil[] = $this->keKanonis($r);
+                    }
                 }
             }
             return $hasil;
         }
- 
+
         // Bentuk 2, objek tunggal dari endpoint latest-bp-records
         if (isset($payload['latest_record']) && is_array($payload['latest_record'])) {
             $hasil[] = $this->keKanonis($payload['latest_record']);
