@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="1138" viewBox="0 0 980 1138" font-family="DejaVu Sans, Helvetica, Arial, sans-serif">
+<rect width="980" height="1138" fill="#ffffff"/>
+<defs>
+  <marker id="aDark" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#34495e"/></marker>
+  <marker id="aBlue" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2f6fb0"/></marker>
+  <marker id="aRed" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c0392b"/></marker>
+  <marker id="aGreen" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2e7d46"/></marker>
+  <marker id="aTeal" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#138d75"/></marker>
+  <marker id="aPurple" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7d5ba6"/></marker>
+</defs>
+
+<!-- ===== 1. LATAR TIER ===== -->
+<rect x="30" y="80" width="660" height="120" rx="8" fill="#f6f7f9" stroke="#d3d8de"/>
+<rect x="710" y="80" width="240" height="120" rx="8" fill="#fafafa" stroke="#9aa5b1" stroke-dasharray="5,3"/>
+<rect x="30" y="222" width="660" height="268" rx="8" fill="#f6f7f9" stroke="#d3d8de"/>
+<rect x="30" y="532" width="920" height="420" rx="8" fill="#f6f7f9" stroke="#d3d8de"/>
+<rect x="30" y="966" width="920" height="104" rx="8" fill="#f6f7f9" stroke="#d3d8de"/>
+
+<!-- ===== 2. JUDUL DAN LABEL TIER ===== -->
+<text x="30" y="38" font-size="20" font-weight="bold" fill="#1a1a1a">Arsitektur Flowbeat</text>
+<text x="30" y="60" font-size="12" fill="#666">Alur tulis dari perangkat ke basis data (kiri) dan alur baca untuk pemantauan (kanan)</text>
+<text x="46" y="102" font-size="14" font-weight="bold" fill="#333">Device Tier</text>
+<text x="674" y="102" font-size="11" font-style="italic" fill="#888" text-anchor="end">Omron, Bluetooth Low Energy</text>
+<text x="726" y="102" font-size="14" font-weight="bold" fill="#333">Presentation Tier</text>
+<text x="726" y="117" font-size="10" font-style="italic" fill="#888">modul paralel, di luar evaluasi</text>
+<text x="46" y="246" font-size="14" font-weight="bold" fill="#333">Gateway Tier · Bridge Station</text>
+<text x="674" y="246" font-size="11" font-style="italic" fill="#888" text-anchor="end">Python · FastAPI · omblepy + bleak</text>
+<text x="46" y="556" font-size="14" font-weight="bold" fill="#333">Logic Tier · Laravel 11 (PHP 8.2)</text>
+<text x="800" y="556" font-size="11" font-style="italic" fill="#888" text-anchor="end">php artisan serve · port 8080</text>
+<text x="46" y="988" font-size="14" font-weight="bold" fill="#333">Data Tier · MySQL (XAMPP)</text>
+
+<!-- ===== 3. GARIS ALUR BACA (di bawah pita keamanan) ===== -->
+<line x1="822" y1="650" x2="822" y2="626" stroke="#138d75" stroke-width="1.5"/>
+<line x1="822" y1="572" x2="822" y2="204" stroke="#138d75" stroke-width="1.5" marker-end="url(#aTeal)"/>
+<text x="832" y="300" font-size="10.5" font-weight="bold" fill="#138d75">alur baca</text>
+<text x="832" y="316" font-size="10" fill="#555">data terbaru</text>
+<text x="832" y="331" font-size="10" fill="#555">beserta status</text>
+<text x="832" y="346" font-size="10" fill="#555">klinis, dengan</text>
+<text x="832" y="361" font-size="10" fill="#555">Bearer Token</text>
+
+<!-- ===== 4. KOMPONEN ===== -->
+<!-- perangkat -->
+<rect x="50" y="114" width="300" height="70" rx="6" fill="#fff" stroke="#E8820C" stroke-width="1.6"/>
+<text x="200" y="137" font-size="14" font-weight="bold" fill="#1a1a1a" text-anchor="middle">Omron HEM-7142T</text>
+<text x="200" y="156" font-size="11" fill="#777" text-anchor="middle">sys, dia, bpm, ihb, mov</text>
+<text x="200" y="174" font-size="10.5" fill="#555" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">MAC FA:E4:FA:F7:F7:AC</text>
+<rect x="370" y="114" width="300" height="70" rx="6" fill="#fff" stroke="#E8820C" stroke-width="1.6"/>
+<text x="520" y="137" font-size="14" font-weight="bold" fill="#1a1a1a" text-anchor="middle">Omron HEM-7155T</text>
+<text x="520" y="156" font-size="11" fill="#777" text-anchor="middle">sys, dia, bpm, ihb, mov</text>
+<text x="520" y="174" font-size="10.5" fill="#555" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">MAC 00:5F:BF:1B:AF:01</text>
+
+<!-- presentation -->
+<rect x="725" y="126" width="210" height="28" rx="5" fill="#fff" stroke="#9aa5b1"/>
+<text x="830" y="145" font-size="11.5" fill="#333" text-anchor="middle">Dasbor Web · Next.js</text>
+<rect x="725" y="162" width="210" height="28" rx="5" fill="#fff" stroke="#9aa5b1"/>
+<text x="830" y="181" font-size="11.5" fill="#333" text-anchor="middle">Aplikasi Mobile · React Native</text>
+
+<!-- bridge -->
+<rect x="50" y="262" width="300" height="104" rx="6" fill="#fff" stroke="#2f6fb0" stroke-width="1.4"/>
+<text x="200" y="284" font-size="13" font-weight="bold" fill="#1b4a7a" text-anchor="middle">Bridge 7142T · port 8000</text>
+<text x="64" y="308" font-size="10.5" fill="#222" font-family="DejaVu Sans Mono, monospace">GET  /scan</text>
+<text x="64" y="327" font-size="10.5" fill="#222" font-family="DejaVu Sans Mono, monospace">POST /connect-and-read</text>
+<text x="64" y="346" font-size="10.5" fill="#222" font-family="DejaVu Sans Mono, monospace">POST /latest-bp-records</text>
+<text x="336" y="308" font-size="10" fill="#888" text-anchor="end">cari perangkat</text>
+<text x="336" y="327" font-size="10" fill="#888" text-anchor="end">larik bersarang</text>
+<text x="336" y="346" font-size="10" fill="#888" text-anchor="end">objek tunggal</text>
+<rect x="370" y="262" width="300" height="104" rx="6" fill="#fff" stroke="#2f6fb0" stroke-width="1.4"/>
+<text x="520" y="284" font-size="13" font-weight="bold" fill="#1b4a7a" text-anchor="middle">Bridge 7155T · port 8001</text>
+<text x="384" y="308" font-size="10.5" fill="#222" font-family="DejaVu Sans Mono, monospace">GET  /scan</text>
+<text x="384" y="327" font-size="10.5" fill="#222" font-family="DejaVu Sans Mono, monospace">POST /connect-and-read</text>
+<text x="384" y="346" font-size="10.5" fill="#222" font-family="DejaVu Sans Mono, monospace">POST /latest-bp-records</text>
+<text x="656" y="308" font-size="10" fill="#888" text-anchor="end">cari perangkat</text>
+<text x="656" y="327" font-size="10" fill="#888" text-anchor="end">larik bersarang</text>
+<text x="656" y="346" font-size="10" fill="#888" text-anchor="end">objek tunggal</text>
+
+<!-- klien penerus -->
+<rect x="50" y="410" width="620" height="66" rx="6" fill="#fff" stroke="#4a5a6a" stroke-width="1.3"/>
+<text x="360" y="431" font-size="13" font-weight="bold" fill="#1a1a1a" text-anchor="middle">Klien Penerus</text>
+<text x="360" y="449" font-size="11" fill="#444" text-anchor="middle">Aplikasi mobile React Native saat operasional  ·  Postman atau k6 saat pengujian</text>
+<text x="360" y="466" font-size="10.5" fill="#777" text-anchor="middle">memanggil bridge, menerima JSON, lalu meneruskannya ke backend</text>
+<text x="370" y="506" font-size="10.5" font-weight="bold" fill="#1b4a7a" font-family="DejaVu Sans Mono, monospace">POST /api/v1/ingest · Bearer Token</text>
+<text x="370" y="522" font-size="10" fill="#666">HTTPS via ngrok, atau HTTP lokal saat pengujian</text>
+
+<!-- pita keamanan -->
+<rect x="50" y="570" width="880" height="58" rx="6" fill="#fdeeee" stroke="#c0392b" stroke-width="1.2"/>
+<text x="380" y="591" font-size="12.5" font-weight="bold" fill="#a5281b" text-anchor="middle">Lapisan Keamanan Gerbang, berlaku untuk semua endpoint</text>
+<text x="380" y="611" font-size="11" fill="#7c1d13" text-anchor="middle">SecurityHeaders · auth:sanctum · abilities · throttle (rate limit) · IngestRequest · RequestLogger</text>
+
+<!-- pipeline ingest -->
+<rect x="200" y="650" width="340" height="44" rx="6" fill="#dbe7f5" stroke="#2f6fb0" stroke-width="1.4"/>
+<text x="370" y="669" font-size="12.5" font-weight="bold" fill="#1b4a7a" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">POST /api/v1/ingest</text>
+<text x="370" y="686" font-size="11" fill="#3a6a95" text-anchor="middle">ApiAdapterController, gerbang tunggal</text>
+<rect x="200" y="716" width="340" height="44" rx="6" fill="#fff" stroke="#2c3e50" stroke-width="1.2"/>
+<text x="370" y="735" font-size="13" font-weight="bold" fill="#1a1a1a" text-anchor="middle">AdapterRegistry</text>
+<text x="370" y="752" font-size="11" fill="#777" text-anchor="middle">memilih adapter dari mac_address</text>
+
+<rect x="50" y="796" width="200" height="50" rx="6" fill="#fff" stroke="#2c3e50" stroke-width="1.2"/>
+<text x="150" y="817" font-size="12.5" font-weight="bold" fill="#1a1a1a" text-anchor="middle">Hem7142Adapter</text>
+<text x="150" y="835" font-size="10" fill="#777" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">FA:E4:FA:F7:F7:AC</text>
+<rect x="270" y="796" width="200" height="50" rx="6" fill="#fff" stroke="#2c3e50" stroke-width="1.2"/>
+<text x="370" y="817" font-size="12.5" font-weight="bold" fill="#1a1a1a" text-anchor="middle">Hem7155Adapter</text>
+<text x="370" y="835" font-size="10" fill="#777" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">00:5F:BF:1B:AF:01</text>
+<rect x="490" y="796" width="200" height="50" rx="6" fill="#fff" stroke="#2e7d46" stroke-width="1.3" stroke-dasharray="5,3"/>
+<text x="590" y="817" font-size="12.5" font-weight="bold" fill="#2e7d46" text-anchor="middle">VendorBAdapter</text>
+<text x="590" y="835" font-size="10" fill="#5a8f6e" text-anchor="middle">titik perluasan, simulasi</text>
+
+<rect x="50" y="876" width="200" height="46" rx="6" fill="#fff" stroke="#2c3e50" stroke-width="1.2"/>
+<text x="150" y="896" font-size="12.5" font-weight="bold" fill="#1a1a1a" text-anchor="middle">CanonicalVitalSign</text>
+<text x="150" y="913" font-size="10.5" fill="#777" text-anchor="middle">bentuk data seragam</text>
+<rect x="270" y="876" width="200" height="46" rx="6" fill="#fff" stroke="#2c3e50" stroke-width="1.2"/>
+<text x="370" y="896" font-size="12.5" font-weight="bold" fill="#1a1a1a" text-anchor="middle">DataQualityService</text>
+<text x="370" y="913" font-size="10.5" fill="#777" text-anchor="middle">aturan kelogisan medis</text>
+<rect x="490" y="876" width="200" height="46" rx="6" fill="#fff" stroke="#2c3e50" stroke-width="1.2"/>
+<text x="590" y="896" font-size="12.5" font-weight="bold" fill="#1a1a1a" text-anchor="middle">Dedup SHA-256</text>
+<text x="590" y="913" font-size="10.5" fill="#777" text-anchor="middle">record_hash unik</text>
+
+<!-- kolom kanan logic -->
+<rect x="715" y="650" width="215" height="96" rx="6" fill="#e6f5f1" stroke="#138d75" stroke-width="1.3"/>
+<text x="822" y="670" font-size="10.5" font-weight="bold" fill="#0e6655" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">GET /api/v1/monitoring/latest</text>
+<text x="822" y="689" font-size="12" font-weight="bold" fill="#1a1a1a" text-anchor="middle">MonitoringController</text>
+<text x="822" y="706" font-size="11" fill="#333" text-anchor="middle">VitalSignClassifier</text>
+<text x="822" y="722" font-size="10.5" fill="#666" text-anchor="middle">Normal · Waspada · Tinggi</text>
+<text x="822" y="738" font-size="10" fill="#888" text-anchor="middle">membaca patient_records</text>
+<rect x="715" y="766" width="215" height="80" rx="6" fill="#f3eefb" stroke="#7d5ba6" stroke-width="1.3"/>
+<text x="822" y="786" font-size="11" font-weight="bold" fill="#5b3f85" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">POST /api/login</text>
+<text x="822" y="804" font-size="10.5" fill="#333" text-anchor="middle">verifikasi akun, terbitkan</text>
+<text x="822" y="820" font-size="10.5" fill="#333" text-anchor="middle">token Sanctum berkemampuan</text>
+<text x="822" y="836" font-size="10" fill="#666" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">ingest:write · monitoring:read</text>
+
+<!-- data tier -->
+<rect x="50" y="1000" width="200" height="54" rx="6" fill="#fff" stroke="#d08a1e" stroke-width="1.3"/>
+<text x="150" y="1022" font-size="12" font-weight="bold" fill="#8a5a12" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">api_request_logs</text>
+<text x="150" y="1041" font-size="10" fill="#777" text-anchor="middle">jejak audit tiap permintaan</text>
+<rect x="270" y="1000" width="200" height="54" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.3" stroke-dasharray="5,3"/>
+<text x="370" y="1022" font-size="12" font-weight="bold" fill="#a5281b" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">anomaly_logs</text>
+<text x="370" y="1041" font-size="10" fill="#777" text-anchor="middle">data ditolak beserta alasan</text>
+<rect x="490" y="1000" width="200" height="54" rx="6" fill="#fff" stroke="#2f6fb0" stroke-width="1.4"/>
+<text x="590" y="1022" font-size="12" font-weight="bold" fill="#1b4a7a" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">patient_records</text>
+<text x="590" y="1041" font-size="10" fill="#777" text-anchor="middle">tabel kanonis, quality_flag</text>
+<rect x="715" y="1000" width="215" height="54" rx="6" fill="#fff" stroke="#7d5ba6" stroke-width="1.3"/>
+<text x="822" y="1022" font-size="12" font-weight="bold" fill="#5b3f85" text-anchor="middle" font-family="DejaVu Sans Mono, monospace">personal_access_tokens</text>
+<text x="822" y="1041" font-size="10" fill="#777" text-anchor="middle">token akses, terhubung ke users</text>
+
+<!-- ===== 5. PANAH (digambar terakhir agar tidak tertutup) ===== -->
+<line x1="200" y1="184" x2="200" y2="232" stroke="#34495e" stroke-width="1.3"/><line x1="200" y1="251" x2="200" y2="259" stroke="#34495e" stroke-width="1.3" marker-end="url(#aDark)"/>
+<line x1="520" y1="184" x2="520" y2="232" stroke="#34495e" stroke-width="1.3"/><line x1="520" y1="251" x2="520" y2="259" stroke="#34495e" stroke-width="1.3" marker-end="url(#aDark)"/>
+<text x="208" y="214" font-size="11" fill="#555">BLE</text>
+<text x="528" y="214" font-size="11" fill="#555">BLE</text>
+
+<line x1="180" y1="410" x2="180" y2="369" stroke="#34495e" stroke-width="1.2" marker-end="url(#aDark)"/>
+<line x1="220" y1="366" x2="220" y2="407" stroke="#34495e" stroke-width="1.2" marker-end="url(#aDark)"/>
+<text x="172" y="392" font-size="10" fill="#555" text-anchor="end">permintaan</text>
+<text x="228" y="392" font-size="10" fill="#555">JSON heterogen</text>
+<line x1="500" y1="410" x2="500" y2="369" stroke="#34495e" stroke-width="1.2" marker-end="url(#aDark)"/>
+<line x1="540" y1="366" x2="540" y2="407" stroke="#34495e" stroke-width="1.2" marker-end="url(#aDark)"/>
+<text x="492" y="392" font-size="10" fill="#555" text-anchor="end">permintaan</text>
+<text x="548" y="392" font-size="10" fill="#555">JSON heterogen</text>
+
+<line x1="360" y1="476" x2="360" y2="567" stroke="#34495e" stroke-width="1.4" marker-end="url(#aDark)"/>
+
+<line x1="370" y1="628" x2="370" y2="647" stroke="#34495e" stroke-width="1.3" marker-end="url(#aDark)"/>
+<line x1="370" y1="694" x2="370" y2="713" stroke="#34495e" stroke-width="1.3" marker-end="url(#aDark)"/>
+<line x1="300" y1="760" x2="152" y2="793" stroke="#34495e" stroke-width="1.2" marker-end="url(#aDark)"/>
+<line x1="370" y1="760" x2="370" y2="793" stroke="#34495e" stroke-width="1.2" marker-end="url(#aDark)"/>
+<line x1="440" y1="760" x2="588" y2="793" stroke="#2e7d46" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#aGreen)"/>
+
+<line x1="150" y1="846" x2="150" y2="861" stroke="#34495e" stroke-width="1.2"/>
+<line x1="370" y1="846" x2="370" y2="861" stroke="#34495e" stroke-width="1.2"/>
+<line x1="590" y1="846" x2="590" y2="861" stroke="#2e7d46" stroke-width="1.2" stroke-dasharray="4,3"/>
+<line x1="150" y1="861" x2="590" y2="861" stroke="#34495e" stroke-width="1.2"/>
+<line x1="150" y1="861" x2="150" y2="873" stroke="#34495e" stroke-width="1.2" marker-end="url(#aDark)"/>
+
+<line x1="250" y1="899" x2="267" y2="899" stroke="#34495e" stroke-width="1.3" marker-end="url(#aDark)"/>
+<line x1="470" y1="899" x2="487" y2="899" stroke="#2f6fb0" stroke-width="1.3" marker-end="url(#aBlue)"/>
+
+<line x1="370" y1="922" x2="370" y2="997" stroke="#c0392b" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#aRed)"/>
+<text x="378" y="943" font-size="10.5" font-weight="bold" fill="#c0392b">ditolak</text>
+<line x1="590" y1="922" x2="590" y2="997" stroke="#2f6fb0" stroke-width="1.5" marker-end="url(#aBlue)"/>
+<text x="598" y="943" font-size="10.5" font-weight="bold" fill="#2f6fb0">lolos dan unik</text>
+<line x1="822" y1="846" x2="822" y2="997" stroke="#7d5ba6" stroke-width="1.3" marker-end="url(#aPurple)"/>
+<text x="830" y="904" font-size="10.5" fill="#5b3f85">simpan token</text>
+
+<!-- ===== 6. LEGENDA ===== -->
+<line x1="40" y1="1094" x2="68" y2="1094" stroke="#34495e" stroke-width="1.4" marker-end="url(#aDark)"/>
+<text x="76" y="1098" font-size="10.5" fill="#444">alur tulis (ingest)</text>
+<line x1="210" y1="1094" x2="238" y2="1094" stroke="#2f6fb0" stroke-width="1.5" marker-end="url(#aBlue)"/>
+<text x="246" y="1098" font-size="10.5" fill="#444">lolos, disimpan</text>
+<line x1="360" y1="1094" x2="388" y2="1094" stroke="#c0392b" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#aRed)"/>
+<text x="396" y="1098" font-size="10.5" fill="#444">ditolak, dicatat</text>
+<line x1="510" y1="1094" x2="538" y2="1094" stroke="#2e7d46" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#aGreen)"/>
+<text x="546" y="1098" font-size="10.5" fill="#444">titik perluasan</text>
+<line x1="660" y1="1094" x2="688" y2="1094" stroke="#138d75" stroke-width="1.5" marker-end="url(#aTeal)"/>
+<text x="696" y="1098" font-size="10.5" fill="#444">alur baca (pemantauan)</text>
+<text x="40" y="1122" font-size="10" fill="#888">Port dan alamat mengikuti lingkungan pengembangan. Bridge berjalan di laptop yang memiliki Bluetooth, satu instance per perangkat.</text>
+</svg>

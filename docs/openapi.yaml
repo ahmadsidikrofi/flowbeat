@@ -1,0 +1,442 @@
+openapi: 3.1.0
+
+info:
+  title: Flowbeat API
+  version: 1.1.0
+  summary: Integrasi data tanda vital dari tensimeter Omron ke satu skema kanonis
+  description: |
+    Dokumen ini mencakup dua layanan.
+
+    1. **Bridge Omron (FastAPI)**, berjalan di laptop yang memiliki Bluetooth.
+       Satu instance per perangkat, HEM-7142T di port 8000 dan HEM-7155T di port 8001.
+       Bridge hanya membaca perangkat dan mengembalikan JSON, tidak mengirim ke backend.
+    2. **Backend Flowbeat (Laravel 11)** di port 8080. Klien (aplikasi mobile, Postman, k6)
+       meneruskan JSON dari bridge ke `POST /api/v1/ingest`.
+
+    Seluruh endpoint backend kecuali login wajib memakai Bearer Token Laravel Sanctum.
+  contact:
+    name: Muhamad Ivan Fadilah
+  license:
+    name: Artefak penelitian tesis
+
+servers:
+  - url: http://127.0.0.1:8080
+    description: Backend Laravel, lokal
+  - url: https://{subdomain}.ngrok-free.app
+    description: Backend Laravel melalui tunnel ngrok, untuk akses dari HP
+    variables:
+      subdomain:
+        default: contoh
+
+tags:
+  - name: Bridge
+    description: Layanan FastAPI pembaca tensimeter Omron lewat Bluetooth Low Energy
+  - name: Autentikasi
+    description: Penerbitan token Sanctum
+  - name: Ingest
+    description: Penerimaan dan penyeragaman data tanda vital
+  - name: Pemantauan
+    description: Pembacaan data terbaru untuk dasbor
+
+paths:
+
+  # ================= BRIDGE FASTAPI =================
+  /:
+    get:
+      tags: [Bridge]
+      operationId: bridgeHealth
+      summary: Cek bridge berjalan
+      servers:
+        - url: http://{ip_laptop}:{port}
+          variables:
+            ip_laptop: { default: 192.168.1.10 }
+            port: { enum: ["8000", "8001"], default: "8000" }
+      responses:
+        '200':
+          description: Bridge aktif
+          content:
+            application/json:
+              example: { message: "Omron BLE Python Backend is running" }
+
+  /scan:
+    get:
+      tags: [Bridge]
+      operationId: bridgeScan
+      summary: Memindai perangkat Bluetooth di sekitar laptop
+      servers:
+        - url: http://{ip_laptop}:{port}
+          variables:
+            ip_laptop: { default: 192.168.1.10 }
+            port: { enum: ["8000", "8001"], default: "8000" }
+      responses:
+        '200':
+          description: Daftar perangkat yang ditemukan
+          content:
+            application/json:
+              example:
+                devices: ["..."]
+                message: "Perangkat BLE berhasil dipindai"
+        '500':
+          description: Bluetooth laptop mati atau gagal memindai
+          content:
+            application/json:
+              example: { detail: "Tolong hidupkan bluetooth: ..." }
+
+  /connect-and-read:
+    post:
+      tags: [Bridge]
+      operationId: bridgeConnectAndRead
+      summary: Membaca seluruh riwayat pengukuran dari tensimeter
+      description: |
+        Riwayat diurutkan dari terbaru ke terlama. Setel `pairing` ke true hanya
+        saat pemasangan pertama, saat itu bridge tidak membaca data.
+      servers:
+        - url: http://{ip_laptop}:{port}
+          variables:
+            ip_laptop: { default: 192.168.1.10 }
+            port: { enum: ["8000", "8001"], default: "8000" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BridgeInput' }
+            example:
+              mac_address: "FA:E4:FA:F7:F7:AC"
+              device_name: "BLESmart_00000480FAE4FAF7F7AC"
+              new_records_only: false
+              sync_time: false
+              pairing: false
+      responses:
+        '200':
+          description: Riwayat berhasil dibaca, atau pairing berhasil
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BridgeRiwayat'
+                  - $ref: '#/components/schemas/BridgePairing'
+        '422':
+          description: Body tidak lengkap, seluruh atribut BridgeInput wajib diisi
+        '500':
+          description: |
+            Perangkat tidak ditemukan, gagal tersambung, atau gagal membaca.
+            Pesan aslinya ada di atribut `detail`.
+          content:
+            application/json:
+              example: { detail: "Error: 404: Device not found during scan." }
+
+  /latest-bp-records:
+    post:
+      tags: [Bridge]
+      operationId: bridgeLatest
+      summary: Membaca satu pengukuran terbaru dari tensimeter
+      servers:
+        - url: http://{ip_laptop}:{port}
+          variables:
+            ip_laptop: { default: 192.168.1.10 }
+            port: { enum: ["8000", "8001"], default: "8000" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BridgeInput' }
+      responses:
+        '200':
+          description: Pengukuran terbaru berhasil dibaca
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BridgeTerbaru'
+                  - $ref: '#/components/schemas/BridgePairing'
+        '422':
+          description: Body tidak lengkap
+        '500':
+          description: Perangkat tidak ditemukan atau gagal dibaca
+
+  # ================= BACKEND LARAVEL =================
+  /api/login:
+    post:
+      tags: [Autentikasi]
+      operationId: login
+      summary: Login dan menerima Bearer Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, examples: ["test@example.com"] }
+                password: { type: string, examples: ["password"] }
+      responses:
+        '200':
+          description: Token diterbitkan dengan kemampuan ingest:write dan monitoring:read
+          content:
+            application/json:
+              example:
+                access_token: "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                token_type: "Bearer"
+        '401':
+          description: Email atau password salah
+          content:
+            application/json:
+              example: { message: "Kredensial tidak valid" }
+        '422':
+          description: Email atau password kosong
+
+  /api/v1/ingest:
+    post:
+      tags: [Ingest]
+      operationId: ingestVitalSigns
+      summary: Menerima, menyeragamkan, menyaring, dan menyimpan data tanda vital
+      description: |
+        Tempel JSON hasil bridge apa adanya. Adapter dipilih dari `mac_address`,
+        atau dari `device_model` untuk perangkat non Omron.
+
+        Respons 200 dikembalikan selama perangkat dikenali, termasuk ketika sebagian
+        atau seluruh catatan ditolak oleh aturan kualitas. Lihat angka `ditolak`.
+
+        Permintaan bersifat idempoten. Payload yang sama dikirim ulang tidak
+        menambah catatan, melainkan menaikkan `duplikat`.
+      security:
+        - bearerAuth: []
+      x-kemampuan-token: ingest:write
+      x-batas-laju: 60 permintaan per menit per token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/PayloadRiwayatOmron'
+                - $ref: '#/components/schemas/PayloadTerbaruOmron'
+                - $ref: '#/components/schemas/PayloadVendorB'
+            examples:
+              riwayatOmron:
+                summary: Riwayat Omron, larik bersarang
+                value:
+                  mac_address: "00:5F:BF:1B:AF:01"
+                  records:
+                    - - { sys: 119, dia: 84, bpm: 83, mov: 0, ihb: 0, datetime: "2026-07-22 03:11:13" }
+                      - { sys: 149, dia: 81, bpm: 79, mov: 0, ihb: 1, datetime: "2026-07-05 13:51:56" }
+              terbaruOmron:
+                summary: Pengukuran terbaru Omron, objek tunggal
+                value:
+                  mac_address: "FA:E4:FA:F7:F7:AC"
+                  latest_record: { sys: 123, dia: 85, bpm: 109, mov: 0, ihb: 1, datetime: "2026-07-22T18:38:33.252978" }
+              vendorB:
+                summary: Perangkat simulasi dengan penamaan berbeda
+                value:
+                  device_model: "VENDOR-B-100"
+                  measurements:
+                    - { systolic_mmhg: 118, diastolic_mmhg: 76, heart_rate: 72, recorded_at: "2026-06-15T09:30:00Z" }
+      responses:
+        '200':
+          description: Payload dikenali dan selesai diproses
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HasilIngest' }
+              examples:
+                sebagianDitolak:
+                  value: { status: berhasil, tersimpan: 73, duplikat: 0, ditolak: 9, alasan_ditolak: ["stempel waktu bawaan pabrik, jam perangkat belum disetel"], processing_ms: 474 }
+                kirimUlang:
+                  value: { status: berhasil, tersimpan: 0, duplikat: 15, ditolak: 0, alasan_ditolak: [], processing_ms: 70 }
+        '401': { $ref: '#/components/responses/TanpaToken' }
+        '403': { $ref: '#/components/responses/TanpaKemampuan' }
+        '422':
+          description: Perangkat tidak dikenali, atau struktur payload tidak valid
+          content:
+            application/json:
+              example: { status: ditolak, pesan: "perangkat tidak dikenali oleh adapter mana pun" }
+        '429': { $ref: '#/components/responses/BatasLaju' }
+
+  /api/v1/monitoring/latest:
+    get:
+      tags: [Pemantauan]
+      operationId: monitoringLatest
+      summary: Data tanda vital terbaru beserta status klinis
+      description: |
+        Status dihitung oleh VitalSignClassifier dari sistolik dan diastolik,
+        dengan nilai Normal, Waspada, atau Tinggi. Status ini alat bantu pemantauan,
+        bukan diagnosis.
+      security:
+        - bearerAuth: []
+      x-kemampuan-token: monitoring:read
+      x-batas-laju: 120 permintaan per menit per token
+      responses:
+        '200':
+          description: Daftar data terbaru
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HasilMonitoring' }
+              example:
+                status: berhasil
+                jumlah: 1
+                data:
+                  - device_model: HEM-7142T
+                    systolic: 120
+                    diastolic: 80
+                    pulse: 75
+                    measured_at: "2026-01-01 10:00:00"
+                    quality_flag: Verified
+                    status: Waspada
+        '401': { $ref: '#/components/responses/TanpaToken' }
+        '403': { $ref: '#/components/responses/TanpaKemampuan' }
+        '429': { $ref: '#/components/responses/BatasLaju' }
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: "Token dari POST /api/login, dikirim sebagai `Authorization: Bearer <token>`"
+
+  responses:
+    TanpaToken:
+      description: Token tidak dikirim, salah, atau tanpa awalan Bearer
+      content:
+        application/json:
+          example: { message: "Unauthenticated." }
+    TanpaKemampuan:
+      description: Token sah tetapi tidak memiliki kemampuan yang dibutuhkan
+      content:
+        application/json:
+          example: { message: "Invalid ability provided." }
+    BatasLaju:
+      description: Terlalu banyak permintaan, tunggu satu menit
+      content:
+        application/json:
+          example: { message: "Too Many Attempts." }
+
+  schemas:
+
+    BridgeInput:
+      type: object
+      description: Seluruh atribut wajib diisi
+      required: [mac_address, device_name, new_records_only, sync_time, pairing]
+      properties:
+        mac_address: { type: string, examples: ["FA:E4:FA:F7:F7:AC"] }
+        device_name: { type: string, examples: ["BLESmart_00000480FAE4FAF7F7AC"] }
+        new_records_only: { type: boolean, description: true untuk membaca catatan yang belum pernah dibaca saja }
+        sync_time: { type: boolean, description: true untuk menyetel jam perangkat }
+        pairing: { type: boolean, description: true hanya saat pemasangan pertama }
+
+    CatatanOmron:
+      type: object
+      required: [sys, dia, bpm, datetime]
+      properties:
+        sys: { description: Sistolik mmHg, oneOf: [{ type: integer }, { type: string }] }
+        dia: { description: Diastolik mmHg, oneOf: [{ type: integer }, { type: string }] }
+        bpm: { description: Denyut nadi per menit, oneOf: [{ type: integer }, { type: string }] }
+        mov: { description: Penanda gerakan tubuh, oneOf: [{ type: integer }, { type: string }] }
+        ihb: { description: Penanda detak tidak teratur, oneOf: [{ type: integer }, { type: string }] }
+        datetime: { type: string, description: "YYYY-MM-DD HH:MM:SS atau ISO 8601" }
+        id: { type: string, description: Penanda 12 karakter dari bridge, diabaikan backend }
+
+    BridgeRiwayat:
+      type: object
+      properties:
+        message: { type: string, examples: ["Data read successfully."] }
+        mac_address: { type: string }
+        device_name: { type: string }
+        records:
+          type: array
+          description: |
+            Bridge versi saat ini mengembalikan daftar datar dari terbaru ke terlama.
+            Backend menerima bentuk datar maupun bersarang.
+          items: { $ref: '#/components/schemas/CatatanOmron' }
+
+    BridgeTerbaru:
+      type: object
+      properties:
+        message: { type: string, examples: ["Newest record read with success."] }
+        mac_address: { type: string }
+        device_name: { type: string }
+        latest_record: { $ref: '#/components/schemas/CatatanOmron' }
+
+    BridgePairing:
+      type: object
+      properties:
+        message: { type: string, examples: ["Pairing successful."] }
+
+    PayloadRiwayatOmron:
+      type: object
+      required: [mac_address, records]
+      properties:
+        mac_address: { type: string }
+        device_name: { type: string, description: Tidak dipakai untuk pengenalan perangkat }
+        records:
+          description: Larik bersarang per bank pengguna, atau larik datar langsung dari bridge
+          oneOf:
+            - type: array
+              items:
+                type: array
+                items: { $ref: '#/components/schemas/CatatanOmron' }
+            - type: array
+              items: { $ref: '#/components/schemas/CatatanOmron' }
+
+    PayloadTerbaruOmron:
+      type: object
+      required: [mac_address, latest_record]
+      properties:
+        mac_address: { type: string }
+        device_name: { type: string }
+        latest_record: { $ref: '#/components/schemas/CatatanOmron' }
+
+    PayloadVendorB:
+      type: object
+      required: [device_model, measurements]
+      properties:
+        device_model: { type: string, const: VENDOR-B-100 }
+        measurements:
+          type: array
+          items:
+            type: object
+            required: [systolic_mmhg, diastolic_mmhg, heart_rate, recorded_at]
+            properties:
+              systolic_mmhg: { type: integer }
+              diastolic_mmhg: { type: integer }
+              heart_rate: { type: integer }
+              recorded_at: { type: string }
+
+    HasilIngest:
+      type: object
+      required: [status, tersimpan, duplikat, ditolak, alasan_ditolak, processing_ms]
+      properties:
+        status: { type: string, const: berhasil }
+        tersimpan: { type: integer, description: Catatan baru yang lolos dan disimpan }
+        duplikat: { type: integer, description: Catatan yang sudah pernah tersimpan }
+        ditolak: { type: integer, description: Catatan yang gagal aturan kualitas, dicatat di anomaly_logs }
+        alasan_ditolak:
+          type: array
+          items:
+            type: string
+            enum:
+              - denyut nadi di luar rentang wajar
+              - sistolik di luar rentang wajar
+              - diastolik di luar rentang wajar
+              - sistolik tidak lebih besar dari diastolik
+              - waktu pengukuran berada di masa depan
+              - stempel waktu bawaan pabrik, jam perangkat belum disetel
+        processing_ms: { type: integer, description: Waktu proses di server, tanpa waktu jaringan }
+
+    HasilMonitoring:
+      type: object
+      properties:
+        status: { type: string, const: berhasil }
+        jumlah: { type: integer }
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              device_model: { type: string }
+              systolic: { type: integer }
+              diastolic: { type: integer }
+              pulse: { type: integer }
+              measured_at: { type: string }
+              quality_flag: { type: string, enum: [Verified, Experimental] }
+              status: { type: string, enum: [Normal, Waspada, Tinggi] }
