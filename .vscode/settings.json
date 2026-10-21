@@ -1,0 +1,3 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/services/sensors-gateway/.venv/Scripts/python.exe"
+}

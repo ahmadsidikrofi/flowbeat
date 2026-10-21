@@ -1,0 +1,236 @@
+:root {
+    --bg-color: #F4F7FB;
+    --card-bg: #FFFFFF;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --hr-color: #FF4B4B;
+    --hr-glow: rgba(255, 75, 75, 0.2);
+    --spo2-color: #00C2FF;
+    --spo2-glow: rgba(0, 194, 255, 0.2);
+    --border-radius: 24px;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.header-left h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.status {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status.offline { background-color: #EF4444; }
+.status.online { background-color: #10B981; }
+
+#status-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #1F2937;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-secondary {
+    background-color: #E5E7EB;
+    color: var(--text-primary);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.widget {
+    grid-column: span 2;
+}
+
+.small-widget {
+    grid-column: span 1;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.widget-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.widget-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+}
+
+.hr-icon { color: var(--hr-color); }
+.spo2-icon { color: var(--spo2-color); }
+
+.widget-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.value-container {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.main-value {
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    transition: color 0.3s ease;
+}
+
+.unit {
+    font-size: 18px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Rings */
+.progress-ring-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring__circle {
+    stroke-dasharray: 326.726; /* 2 * pi * r (52) */
+    stroke-dashoffset: 326.726;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease-out;
+}
+
+/* Animations */
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    15% { transform: scale(1.05); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.05); }
+    60% { transform: scale(1); }
+}
+
+.pulse {
+    animation: heartbeat 1s infinite;
+}
+
+/* Small widgets */
+.small-content {
+    justify-content: flex-start;
+}
+.sub-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Terminal Log */
+.terminal-card {
+    padding: 16px;
+}
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.terminal-header h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+.log-container {
+    margin-top: 12px;
+    background-color: #1F2937;
+    color: #10B981;
+    padding: 12px;
+    border-radius: 8px;
+    height: 150px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+}
+.hidden {
+    display: none;
+}

@@ -1,0 +1,32 @@
+# ── File rahasia ────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Hasil instalasi (bisa dibuat ulang) ─────────────────────
+node_modules/
+vendor/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.expo/
+.next/
+
+# ── Database lokal (bisa berisi data pasien) ────────────────
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+**/Dashboard_RPMS
+
+# ── File biner besar ────────────────────────────────────────
+*.exe
+*.zip
+k6_bin/
+
+# ── Lain-lain ───────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
